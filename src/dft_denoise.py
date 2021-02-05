@@ -48,25 +48,25 @@ def denoise(graph, _threshold_):
     out = dft_lib.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
     # Sync sinusoidal spikes with graph spikes
-    s = [0]
-    for i,v in enumerate(out):
+    spikes = [0]
+    for i, value in enumerate(out):
         if i != 0 and i != N-1:
-            if (v-out[i-1] < 0 and out[i+1]-v > 0):
-                plt.scatter(i,v,10,color="red")
-                s.append(i)
-                if(len(s) > 2):
-                    right = _max_(graph, s[len(s)-1-1], s[len(s)-1])
-                    left = _max_(graph, s[len(s)-2-1], s[len(s)-1-1])
+            # Detect spike on Simplified curve
+            if (value - out[i-1] < 0 and out[i+1] - value > 0):
+                spikes.append(i)
+                if(len(spikes) > 2):
+                    # Find corresponding spike on graph
+                    right = _max_(graph, spikes[len(spikes)-2], spikes[len(spikes)-1])
+                    left = _max_(graph, spikes[len(spikes)-3], spikes[len(spikes)-2])
                     maxv = max2(left, right)
-                    plt.scatter(maxv[1], maxv[0], 10,color="blue") 
-            if v-out[i-1] > 0 and out[i+1]-v < 0:
-                plt.scatter(i,v,10,color="black")
-                s.append(i)
-                if(len(s) > 2):
-                    right = _min_(graph, s[len(s)-1-1], s[len(s)-1])
-                    left = _min_(graph, s[len(s)-2-1], s[len(s)-1-1])
+            # Detect spike on Simplified curve
+            if value - out[i-1] > 0 and out[i+1] - value < 0:
+                spikes.append(i)
+                if(len(spikes) > 2):
+                    # Find corresponding spike on graph
+                    right = _min_(graph, spikes[len(spikes)-2], spikes[len(spikes)-1])
+                    left = _min_(graph, spikes[len(spikes)-3], spikes[len(spikes)-2])
                     minv = min2(left, right)
-                    plt.scatter(minv[1], minv[0], 10,color="blue") 
                         
 
     return out
