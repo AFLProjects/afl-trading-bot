@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import dft_lib, dft_denoise
 import csv
 
+
 graph = []
 with open('bot.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
