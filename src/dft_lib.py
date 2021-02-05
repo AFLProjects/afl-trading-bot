@@ -3,6 +3,7 @@ import math
 
 def iexp(n):
     return complex(math.cos(n), math.sin(n))
+    
 def is_pow2(n):
     return False if n == 0 else (n == 1 or is_pow2(n >> 1))
 
@@ -12,6 +13,7 @@ def dft(xs):
     n = len(xs)
     return [sum((xs[k] * iexp(-2 * math.pi * i * k / n) for k in range(n)))
             for i in range(n)]
+
 #  Inverse Discrete Fourier Transform
 def dftinv(xs):
     #naive dft
@@ -30,6 +32,8 @@ def fft_(xs, n, start=0, stride=1):
         rs[i], rs[i + hn] = rs[i] + e * rs[i + hn], rs[i] - e * rs[i + hn]
         pass
     return rs
+
+# Fast Fourier Transform
 def fft(xs):
     assert is_pow2(len(xs))
     return fft_(xs, len(xs))
@@ -45,6 +49,8 @@ def fftinv_(xs, n, start=0, stride=1):
         rs[i], rs[i + hn] = rs[i] + e * rs[i + hn], rs[i] - e * rs[i + hn]
         pass
     return rs
+
+# Inverse Fast Fourier Transform
 def fftinv(xs):
     assert is_pow2(len(xs))
     n = len(xs)
