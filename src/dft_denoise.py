@@ -51,22 +51,22 @@ def denoise(graph, _threshold_):
     s = [0]
     for i,v in enumerate(out):
         if i != 0 and i != N-1:
-            if v-out[i-1] < 0 and out[i+1]-v > 0:
+            if (v-out[i-1] < 0 and out[i+1]-v > 0):
                 plt.scatter(i,v,10,color="red")
                 s.append(i)
                 if(len(s) > 2):
-                    r = _max_(graph, s[len(s)-1-1], s[len(s)-1])
-                    l = _max_(graph, s[len(s)-2-1], s[len(s)-1-1])
-                    k = max2(l, r)
-                    plt.scatter(k[1], k[0], 10,color="blue") 
+                    right = _max_(graph, s[len(s)-1-1], s[len(s)-1])
+                    left = _max_(graph, s[len(s)-2-1], s[len(s)-1-1])
+                    maxv = max2(left, right)
+                    plt.scatter(maxv[1], maxv[0], 10,color="blue") 
             if v-out[i-1] > 0 and out[i+1]-v < 0:
                 plt.scatter(i,v,10,color="black")
                 s.append(i)
                 if(len(s) > 2):
-                    r = _min_(graph, s[len(s)-1-1], s[len(s)-1])
-                    l = _min_(graph, s[len(s)-2-1], s[len(s)-1-1])
-                    k = min2(l, r)
-                    plt.scatter(k[1], k[0], 10,color="blue") 
+                    right = _min_(graph, s[len(s)-1-1], s[len(s)-1])
+                    left = _min_(graph, s[len(s)-2-1], s[len(s)-1-1])
+                    minv = min2(left, right)
+                    plt.scatter(minv[1], minv[0], 10,color="blue") 
                         
 
     return out
