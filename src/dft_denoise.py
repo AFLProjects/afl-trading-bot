@@ -1,5 +1,7 @@
+""" Simplify and denoise graphs using Discrete Fourier Transform """
 import dft_lib
 
+# Simplify graph curve, using Discrete Fourier Transform
 def denoise(graph, _threshold_):
     # Create DFT from graph
     dft_complex = dft_lib.dft(graph)
@@ -11,7 +13,7 @@ def denoise(graph, _threshold_):
     # Apply filter on DFT
     dft_inverse_filter = [complex(0,0)] * N
     for i,c in enumerate(dft_complex):
-        if abs(dft_complex[i]) >= threshold:
+        if abs(c) >= threshold:
             dft_inverse_filter[i] = c
     # Restore graph from filtered DFT
     dft_output = dft_lib.dftinv(dft_inverse_filter)

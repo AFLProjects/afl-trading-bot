@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
+import dft_lib, dft_denoise
 import csv
-
-import dft_lib
-import dft_denoise
 
 graph = []
 with open('bot.csv', newline='') as csvfile:
