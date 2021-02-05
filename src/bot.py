@@ -5,7 +5,7 @@ import dft_lib
 import dft_denoise
 
 graph = []
-with open('./data/data_csv.csv', newline='') as csvfile:
+with open('bot.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
     for i,row in enumerate(spamreader):
         if i > 0:
