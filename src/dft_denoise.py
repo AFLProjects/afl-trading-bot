@@ -38,8 +38,9 @@ def denoise(graph, _threshold_):
     # Restore graph from filtered DFT
     out = dft_lib.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
+    plt.plot(out)
 
-    interpolation = Array(0, N)     # Interpolated spikes
+    interpolation = Array(0, N-1)     # Interpolated spikes
     previousSpike = [graph[0], 0]   # Prevous spike
     spikes = Array(0, 1)            # Spikes on DFT
 
@@ -53,8 +54,9 @@ def denoise(graph, _threshold_):
                     point = _max_(graph, spikes[L-3], spikes[L-1])
                     for j in range(previousSpike[1], point[1]):
                         dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
-                        interpolation[j] = previousSpike[0] + (j-previousSpike[1]) * dj
+                        interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
                     previousSpike = point
+                    plt.scatter(previousSpike[1], previousSpike[0], 10, color="black")
             elif value - out[i-1] > 0 and out[i+1] - value < 0:
                 spikes.append(i)
                 L = len(spikes)
@@ -62,8 +64,24 @@ def denoise(graph, _threshold_):
                     point = _min_(graph, spikes[L-3], spikes[L-1])
                     for j in range(previousSpike[1], point[1]):
                         dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
-                        interpolation[j] = previousSpike[0] + (j-previousSpike[1]) * dj
+                        interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
                     previousSpike = point
+                    plt.scatter(previousSpike[1], previousSpike[0], 10, color="black")
+        if i == N-1:
+            point = [out[spikes[len(spikes)-1]], spikes[len(spikes)-1]]
+            spikes.append(point[1])
+            for j in range(previousSpike[1], point[1]):
+                dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
+            previousSpike = point
+            plt.scatter(previousSpike[1], previousSpike[0], 10, color="black")
+            point = [graph[N-1], N-1]
+            spikes.append(point[1])
+            for j in range(previousSpike[1], point[1]):
+                dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
+            previousSpike = point
+            plt.scatter(previousSpike[1], previousSpike[0], 10, color="black")
     return interpolation
 
         
