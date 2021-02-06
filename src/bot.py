@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import dft_lib, dft_denoise
+import time
 import csv
 
 
@@ -7,10 +8,10 @@ graph = []
 with open('bot.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
     for i,row in enumerate(spamreader):
-        if i > 0 and i < 50:
+        if i > 0:
             graph.append(float((', '.join(row)).split(',')[1]))
 
-dft_output = dft_denoise.denoise(graph, .95)
+dft_output = dft_denoise.denoise(graph, .85)
 
 plt.plot(graph)
 plt.plot(dft_output)
@@ -37,3 +38,5 @@ for i,v in enumerate(dft_output):
             out = "Money : {}€ , {}{}%".format(round(money), sign, amount)
             print(out)
 plt.show()
+
+

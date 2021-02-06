@@ -1,6 +1,7 @@
 """ Simplify and denoise graphs using Discrete Fourier Transform """
 import dft_lib
 import matplotlib.pyplot as plt
+from math import *
 
 # Find greatest value in an array within a range
 def _max_(t, start, end):
@@ -33,7 +34,7 @@ def denoise(graph, _threshold_):
     # Sort data and determine threshold percentile
     dft_graph_sorted  = [abs(dft_complex[i]) for i in range(N)]
     dft_graph_sorted.sort()
-    threshold = dft_graph_sorted[int(round(_threshold_ * float(N)))]
+    threshold = dft_graph_sorted[int(floor(_threshold_ * float(N)))]
 
     # Apply filter on DFT
     dft_inverse_filter = [complex(0,0)] * N
@@ -44,7 +45,6 @@ def denoise(graph, _threshold_):
     # Restore graph from filtered DFT
     out = dft_lib.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
-    plt.plot(out)
 
     interpolation = Array(0, N)     # Interpolated spikes
     previousSpike = [graph[0], 0]   # Prevous spike
@@ -77,7 +77,9 @@ def denoise(graph, _threshold_):
             linearInterpolation(interpolation, previousSpike, point)
             previousSpike = point
             point = [graph[N-1], N-1]
-            linearInterpolation(interpolation, previousSpike, point)
+            for j in range(previousSpike[1], point[1]+1):
+                dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
     return interpolation
 
         
