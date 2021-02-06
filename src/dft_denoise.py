@@ -1,4 +1,4 @@
-""" Simplify and denoise graphs using Discr Fourier Transform """
+""" Simplify and denoise graphs using Discrete Fourier Transform """
 import dft_lib
 import matplotlib.pyplot as plt
 
@@ -6,21 +6,17 @@ import matplotlib.pyplot as plt
 def _max_(t, start, end):
     m = max(t[start:end])
     i = start + (t[start:end]).index(m)
-    return [m,i]
+    return (m,i)
 
 # Find lowest value in an array within a range
 def _min_(t, start, end):
     m = min(t[start:end])
     i = start + (t[start:end]).index(m)
-    return [m,i]
+    return (m,i)
 
-# Greatest value between two values [value,index]
-def max2(x1, x2):
-    return x1 if x1[0] >= x2[0] else x2
-
-# Lowest value between two values [value,index]
-def min2(x1, x2):
-    return x1 if x1[0] <= x2[0] else x2
+# Initialize array
+def Array(fill = 0, size = 0):
+    return [fill] * size
 
 # Simplify graph curve, using Discrete Fourier Transform
 def denoise(graph, _threshold_):
@@ -43,35 +39,32 @@ def denoise(graph, _threshold_):
     out = dft_lib.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
 
-    # Determine spikes on the graph
-    pts = [0]
-    _out_ = [None] * N
-    prevPoint = [graph[0], 0]
+    interpolation = Array(0, N)     # Interpolated spikes
+    previousSpike = [graph[0], 0]   # Prevous spike
+    spikes = Array(0, 1)            # Spikes on DFT
+
+    # Determine corresponding spikes on the graph and interpolate
     for i, value in enumerate(out):
         if i != 0 and i != N-1:
             if value - out[i-1] < 0 and out[i+1] - value > 0:
-                pts.append(i)
-                L = len(pts)
+                spikes.append(i)
+                L = len(spikes)
                 if L > 2:
-                    right = _max_(graph, pts[L-2], pts[L-1])
-                    left = _max_(graph, pts[L-3], pts[L-2])
-                    point = max2(left, right)
-                    for j in range(prevPoint[1], point[1]):
-                        dj = (point[0] - prevPoint[0]) / (point[1] - prevPoint[1])
-                        _out_[j] = prevPoint[0] + (j-prevPoint[1]) * dj
-                    prevPoint = point
+                    point = _max_(graph, spikes[L-3], spikes[L-1])
+                    for j in range(previousSpike[1], point[1]):
+                        dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                        interpolation[j] = previousSpike[0] + (j-previousSpike[1]) * dj
+                    previousSpike = point
             elif value - out[i-1] > 0 and out[i+1] - value < 0:
-                pts.append(i)
-                L = len(pts)
+                spikes.append(i)
+                L = len(spikes)
                 if L > 2:
-                    right = _min_(graph, pts[L-2], pts[L-1])
-                    left = _min_(graph, pts[L-3], pts[L-2])
-                    point = min2(left, right)
-                    for j in range(prevPoint[1], point[1]):
-                        dj = (point[0] - prevPoint[0]) / (point[1] - prevPoint[1])
-                        _out_[j] = prevPoint[0] + (j-prevPoint[1]) * dj
-                    prevPoint = point
-    return _out_
+                    point = _min_(graph, spikes[L-3], spikes[L-1])
+                    for j in range(previousSpike[1], point[1]):
+                        dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                        interpolation[j] = previousSpike[0] + (j-previousSpike[1]) * dj
+                    previousSpike = point
+    return interpolation
 
         
     
