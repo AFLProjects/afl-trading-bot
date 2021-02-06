@@ -49,23 +49,29 @@ def denoise(graph, _threshold_):
     out = [out[i].real for i in range(N)]
     # Sync sinusoidal spikes with graph spikes
     pts = [0]
+    sX = []
+    sY = []
     for i, value in enumerate(out):
         if i != 0 and i != N-1:
             if value - out[i-1] < 0 and out[i+1] - value > 0:
                 pts.append(i)
                 L = len(pts)
-                if len(pts) > 2:
+                if L > 2:
                     right = _max_(graph, pts[L-2], pts[L-1])
                     left = _max_(graph, pts[L-3], pts[L-2])
                     point = max2(left, right)
+                    sX.append(point[1])
+                    sY.append(point[0])
             if value - out[i-1] > 0 and out[i+1] - value < 0:
                 pts.append(i)
                 L = len(pts)
-                if len(pts) > 2:
+                if L > 2:
                     right = _min_(graph, pts[L-2], pts[L-1])
                     left = _min_(graph, pts[L-3], pts[L-2])
                     point = min2(left, right)
-    return out
+                    sX.append(point[1])
+                    sY.append(point[0])
+    return [sX,sY]
 
         
     

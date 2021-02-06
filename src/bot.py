@@ -13,7 +13,7 @@ with open('bot.csv', newline='') as csvfile:
 dft_output = dft_denoise.denoise(graph, .85)
 
 plt.plot(graph)
-plt.plot(dft_output)
+plt.plot(dft_output[0], dft_output[1])
 
 money = 1000
 moneyOld = 0
