@@ -13,9 +13,9 @@ with open('bot.csv', newline='') as csvfile:
 dft_output = dft_denoise.denoise(graph, .85)
 
 plt.plot(graph)
-plt.plot(dft_output[0], dft_output[1])
+plt.plot(dft_output)
 
-money = 1000
+"""money = 1000
 moneyOld = 0
 q = 0
 for i,v in enumerate(dft_output):
@@ -36,5 +36,5 @@ for i,v in enumerate(dft_output):
             amount = abs(round((money - moneyOld) / moneyOld * 100))
             out = "Money : {}€ , {}{}%".format(round(money), sign, amount)
             print(out)
-
+"""
 plt.show()
