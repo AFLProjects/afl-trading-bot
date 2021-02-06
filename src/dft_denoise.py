@@ -46,7 +46,7 @@ def denoise(graph, _threshold_):
     out = [out[i].real for i in range(N)]
     plt.plot(out)
 
-    interpolation = Array(0, N-1)   # Interpolated spikes
+    interpolation = Array(0, N)     # Interpolated spikes
     previousSpike = [graph[0], 0]   # Prevous spike
     spikes = Array(0, 1)            # Spikes on DFT
 
@@ -69,13 +69,15 @@ def denoise(graph, _threshold_):
                     previousSpike = point
         if i == N-1:
             point = [out[spikes[len(spikes)-1]], spikes[len(spikes)-1]]
+            if out[point[1]] - out[point[1]-1] > 0 and out[point[1]+1] - out[point[1]] < 0:
+                point = _max_(graph, previousSpike[1], N-1)
+            else:
+                point = _min_(graph, previousSpike[1], N-1)
             spikes.append(point[1])
             linearInterpolation(interpolation, previousSpike, point)
             previousSpike = point
             point = [graph[N-1], N-1]
-            spikes.append(point[1])
             linearInterpolation(interpolation, previousSpike, point)
-            previousSpike = point
     return interpolation
 
         
