@@ -32,52 +32,39 @@ def min2(x1, x2):
 
 # Simplify graph curve, using Discrete Fourier Transform
 def denoise(graph, _threshold_):
-
     # Create DFT from graph
     dft_complex = dft_lib.dft(graph)
     N = len(dft_complex)
-
     # Sort data and determine threshold percentile
     dft_graph_sorted  = [abs(dft_complex[i]) for i in range(N)]
     dft_graph_sorted.sort()
     threshold = dft_graph_sorted[int(round(_threshold_ * float(N)))]
-
     # Apply filter on DFT
     dft_inverse_filter = [complex(0,0)] * N
     for i,c in enumerate(dft_complex):
         if abs(c) >= threshold:
             dft_inverse_filter[i] = c
-
     # Restore graph from filtered DFT
     out = dft_lib.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
-
     # Sync sinusoidal spikes with graph spikes
     pts = [0]
     for i, value in enumerate(out):
         if i != 0 and i != N-1:
-
-            # Detect spike on Simplified curve
             if value - out[i-1] < 0 and out[i+1] - value > 0:
                 pts.append(i)
-                K = len(pts)
+                L = len(pts)
                 if len(pts) > 2:
-                    # Find corresponding spike on graph
-                    right = _max_(graph, pts[K - 2], pts[K - 1])
-                    left = _max_(graph, pts[K - 3], pts[K - 2])
-                    maxv = max2(left, right)
-
-            # Detect spike on Simplified curve
+                    right = _max_(graph, pts[L-2], pts[L-1])
+                    left = _max_(graph, pts[L-3], pts[L-2])
+                    point = max2(left, right)
             if value - out[i-1] > 0 and out[i+1] - value < 0:
                 pts.append(i)
-                K = len(pts)
+                L = len(pts)
                 if len(pts) > 2:
-                    # Find corresponding spike on graph
-                    right = _min_(graph, pts[K - 2], pts[K - 1])
-                    left = _min_(graph, pts[K - 3], pts[K - 2])
-                    minv = min2(left, right)
-                        
-
+                    right = _min_(graph, pts[L-2], pts[L-1])
+                    left = _min_(graph, pts[L-3], pts[L-2])
+                    point = min2(left, right)
     return out
 
         
