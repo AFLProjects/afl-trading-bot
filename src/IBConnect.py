@@ -8,28 +8,31 @@ import time
 
 import IBOrders
 
+
+# IB API class
 class IBapi(EWrapper, EClient):
+	# Init API
 	def __init__(self):
 		EClient.__init__(self, self)
-		self.contract_details = {} #Contract details will be stored here using reqId as a dictionary key
-
+		self.contract_details = {} 
+	# Next valide order ID
 	def nextValidId(self, orderId: int):
 		super().nextValidId(orderId)
 		self.nextorderId = orderId
 		print('The next valid order id is: ', self.nextorderId)
-
+    # Output order status
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
 		print('orderStatus - orderid:', orderId, 'status:', status, 'filled', filled, 'remaining', remaining, 'lastFillPrice', lastFillPrice)
-	
+	# Output order openning
 	def openOrder(self, orderId, contract, order, orderState):
 		print('openOrder id:', orderId, contract.symbol, contract.secType, '@', contract.exchange, ':', order.action, order.orderType, order.totalQuantity, orderState.status)
-
+	# Output order execution details
 	def execDetails(self, reqId, contract, execution):
 		print('Order Executed: ', reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity)
-
+    # Output contract details
 	def contractDetails(self, reqId: int, contractDetails):
 		self.contract_details[reqId] = contractDetails
-
+    # Retrieve contract details
 	def get_contract_details(self, reqId, contract):
 		self.contract_details[reqId] = None
 		self.reqContractDetails(reqId, contract)
@@ -44,19 +47,17 @@ class IBapi(EWrapper, EClient):
 			raise Exception('error getting contract details')
 		#Return contract details otherwise
 		return app.contract_details[reqId].contract
-
 def run_loop():
 	app.run()
 
+
+#Init app
 app = IBapi()
 app.connect('127.0.0.1', 7497, 123)
-
 app.nextorderId = None
-
 #Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
 api_thread.start()
-
 #Check if the API is connected via orderid
 while True:
 	if isinstance(app.nextorderId, int):
@@ -66,10 +67,9 @@ while True:
 	else:
 		print('Waiting For Connection...')
 		time.sleep(1)
-
+# Place order
 contract = IBOrders.IBCurrencyExchange('USD', 'EUR')
 order = IBOrders.IBMarketOrder('BUY', 10)
-
 app.placeOrder(app.nextorderId, contract, order)
 
 

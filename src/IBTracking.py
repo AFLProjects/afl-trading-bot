@@ -1,7 +1,7 @@
 import urllib.request
 
 # Get Price from yahoo website
-def IBGetPrice(stock):
+def IBGetStockPrice(stock):
 	html = ""
 	with urllib.request.urlopen(url) as f:
 	    html = f.read().decode('utf-8')
