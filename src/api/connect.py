@@ -6,9 +6,8 @@ from ibapi.order import *
 import threading
 import time
 
-import IBOrders
+from api import order
 
-# IB API class
 class IBapi(EWrapper, EClient):
 	def __init__(self):
 		EClient.__init__(self, self)
@@ -34,37 +33,29 @@ class IBapi(EWrapper, EClient):
 	def get_contract_details(self, reqId, contract):
 		self.contract_details[reqId] = None
 		self.reqContractDetails(reqId, contract)
-
 		for err_check in range(50):
 			if not self.contract_details[reqId]:
 				time.sleep(0.1)
 			else:
 				break
-
 		if err_check == 49:
 			raise Exception('error getting contract details')
 
 		return app.contract_details[reqId].contract
 
 def initAPI():
-	# Init API
 	app = IBapi()
 	app.connect('127.0.0.1', 7497, 123)
 	app.nextorderId = None
-	# Init thread
+
 	thread_exec = lambda: app.run()
 	api_thread = threading.Thread(target=thread_exec, daemon=True)
 	api_thread.start()
-	# Wait for connection
+
 	while not isinstance(app.nextorderId, int):
 		print('Waiting For Connection...')
 		time.sleep(1)
 	print('Connected !')
 	return app
-
-_API_ = initAPI()
-contract = IBOrders.IBCurrencyExchange('USD', 'EUR')
-order = IBOrders.IBMarketOrder('BUY', 10)
-_API_.placeOrder(_API_.nextorderId, contract, order)
 
 

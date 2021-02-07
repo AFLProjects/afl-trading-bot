@@ -1,9 +1,21 @@
 import matplotlib.pyplot as plt
-import dft_lib, dft_denoise
+
+from api.connect import *
+from api.order import *
+from api.tracking import *
+from dft.dft import *
+from dft.denoise import *
+
 import time
 import csv
 
+_API_ = initAPI()
+contract = IBCurrencyExchange('USD', 'EUR')
+order = IBMarketOrder('BUY', 10)
+_API_.placeOrder(_API_.nextorderId, contract, order)
 
+
+"""
 graph = []
 with open('bot.csv', newline='') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -40,5 +52,5 @@ for i,v in enumerate(dft_output):
             out = "Money : {}€ , {}{}%".format(round(money), sign, amount)
             print(out)
 plt.show()
-
+"""
 

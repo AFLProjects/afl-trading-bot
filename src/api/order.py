@@ -3,9 +3,6 @@ from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
 from ibapi.order import *
 
-import threading
-import time
-
 def IBCurrencyExchange(initialCurrency, finalCurrency):
 	contract = Contract()
 	contract.symbol = finalCurrency

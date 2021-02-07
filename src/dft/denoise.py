@@ -1,5 +1,5 @@
 """ Simplify and denoise graphs using Discrete Fourier Transform """
-import dft_lib
+from dft import dft
 import matplotlib.pyplot as plt
 from math import *
 
