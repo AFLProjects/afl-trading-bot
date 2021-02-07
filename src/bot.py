@@ -10,7 +10,7 @@ import time
 import csv
 
 _API_ = initAPI()
-contract = IBCurrencyExchange('USD', 'EUR')
+contract = IBStockContract('AAPL')
 order = IBMarketOrder('BUY', 10)
 _API_.placeOrder(_API_.nextorderId, contract, order)
 

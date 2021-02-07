@@ -17,7 +17,7 @@ def IBStockContract(symbol, secType='STK', exchange='SMART', currency='USD'):
 	contract.secType = secType
 	contract.exchange = exchange
 	contract.currency = currency
-	contract.PrimaryExch = 'ISLAND'
+	#contract.PrimaryExch = 'ISLAND'
 	return contract
 
 def IBOrder(order, action, quantity):
