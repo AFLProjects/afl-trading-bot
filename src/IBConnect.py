@@ -11,7 +11,7 @@ import IBOrders
 class IBapi(EWrapper, EClient):
 	def __init__(self):
 		EClient.__init__(self, self)
-		self.contract_details = {} 
+		self.contract_details = {} #Contract details will be stored here using reqId as a dictionary key
 
 	def nextValidId(self, orderId: int):
 		super().nextValidId(orderId)
@@ -44,14 +44,15 @@ class IBapi(EWrapper, EClient):
 			raise Exception('error getting contract details')
 		#Return contract details otherwise
 		return app.contract_details[reqId].contract
+
 def run_loop():
 	app.run()
 
-# Connect
 app = IBapi()
 app.connect('127.0.0.1', 7497, 123)
 
 app.nextorderId = None
+
 #Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
 api_thread.start()
@@ -59,7 +60,7 @@ api_thread.start()
 #Check if the API is connected via orderid
 while True:
 	if isinstance(app.nextorderId, int):
-		print('Connected')
+		print('Connected !')
 		print()
 		break
 	else:
@@ -70,7 +71,5 @@ contract = IBOrders.IBCurrencyExchange('USD', 'EUR')
 order = IBOrders.IBMarketOrder('BUY', 10)
 
 app.placeOrder(app.nextorderId, contract, order)
-
-
 
 
