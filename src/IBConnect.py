@@ -20,7 +20,7 @@ class IBapi(EWrapper, EClient):
 		super().nextValidId(orderId)
 		self.nextorderId = orderId
 		print('The next valid order id is: ', self.nextorderId)
-    # Output order status
+	# Output order status
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
 		print('orderStatus - orderid:', orderId, 'status:', status, 'filled', filled, 'remaining', remaining, 'lastFillPrice', lastFillPrice)
 	# Output order openning
@@ -29,10 +29,10 @@ class IBapi(EWrapper, EClient):
 	# Output order execution details
 	def execDetails(self, reqId, contract, execution):
 		print('Order Executed: ', reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity)
-    # Output contract details
+	# Output contract details
 	def contractDetails(self, reqId: int, contractDetails):
 		self.contract_details[reqId] = contractDetails
-    # Retrieve contract details
+	# Retrieve contract details
 	def get_contract_details(self, reqId, contract):
 		self.contract_details[reqId] = None
 		self.reqContractDetails(reqId, contract)
