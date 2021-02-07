@@ -23,7 +23,7 @@ with open('bot.csv', newline='') as csvfile:
         if i > 0:
             graph.append(float((', '.join(row)).split(',')[1]))
 
-dft_output = dft_denoise.denoise(graph, .85)
+dft_output = denoise(graph, .85)
 
 plt.subplot(1,2,1)
 plt.plot(graph)

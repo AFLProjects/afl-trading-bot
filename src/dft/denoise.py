@@ -28,7 +28,7 @@ def linearInterpolation(t, p1, p2):
 # Simplify graph curve, using Discrete Fourier Transform
 def denoise(graph, _threshold_):
     # Create DFT from graph
-    dft_complex = dft_lib.dft(graph)
+    dft_complex = dft.dft(graph)
     N = len(dft_complex)
 
     # Sort data and determine threshold percentile
@@ -43,7 +43,7 @@ def denoise(graph, _threshold_):
             dft_inverse_filter[i] = c
 
     # Restore graph from filtered DFT
-    out = dft_lib.dftinv(dft_inverse_filter)
+    out = dft.dftinv(dft_inverse_filter)
     out = [out[i].real for i in range(N)]
 
     interpolation = Array(0, N)     # Interpolated spikes

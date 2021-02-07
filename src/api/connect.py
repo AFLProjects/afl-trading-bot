@@ -16,17 +16,19 @@ class IBapi(EWrapper, EClient):
 	def nextValidId(self, orderId: int):
 		super().nextValidId(orderId)
 		self.nextorderId = orderId
-		print('The next valid order id is: ', self.nextorderId)
+		print('The next valid order id is: {}'.format(self.nextorderId))
 	
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
-		print('orderStatus - orderid:', orderId, 'status:', status, 'filled', filled, 'remaining', remaining, 'lastFillPrice', lastFillPrice)
+		print('Order status ~ #{} \n\t Status : {} \n\t Filled : {} \n\t Remaining : {} \n\t Last Fill Price : {}'.format(orderId, status, remaining, remaining, lastFillPrice))
 	
 	def openOrder(self, orderId, contract, order, orderState):
-		print('openOrder id:', orderId, contract.symbol, contract.secType, '@', contract.exchange, ':', order.action, order.orderType, order.totalQuantity, orderState.status)
+		print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
+			orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
 	
 	def execDetails(self, reqId, contract, execution):
-		print('Order Executed: ', reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity)
-	
+		print('Order Executed ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Currency : {} \n\t Execution ID : {} \n\t Order ID : {}\n\t Shares : {} \n\t Last Liquidity : {}'.format(
+			reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity))
+
 	def contractDetails(self, reqId: int, contractDetails):
 		self.contract_details[reqId] = contractDetails
 	
