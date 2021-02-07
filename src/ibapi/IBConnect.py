@@ -20,13 +20,13 @@ class IBapi(EWrapper, EClient):
 		print('The next valid order id is: ', self.nextorderId)
 	
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
-		print('orderStatus - orderid:{} status:{} filled:{} remaining:{} lastFillPrice:{}'.format(orderId, status, filled, remaining, lastFillPrice))
+		print('orderStatus - orderid:', orderId, 'status:', status, 'filled', filled, 'remaining', remaining, 'lastFillPrice', lastFillPrice)
 	
 	def openOrder(self, orderId, contract, order, orderState):
-		print('openOrder id: {} {} {} @ {} : {} {} {} {}'.format(orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
+		print('openOrder id:', orderId, contract.symbol, contract.secType, '@', contract.exchange, ':', order.action, order.orderType, order.totalQuantity, orderState.status)
 	
 	def execDetails(self, reqId, contract, execution):
-		print('Order Executed: {} {} {} {} {} {} {} {} '.format(reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity))
+		print('Order Executed: ', reqId, contract.symbol, contract.secType, contract.currency, execution.execId, execution.orderId, execution.shares, execution.lastLiquidity)
 	
 	def contractDetails(self, reqId: int, contractDetails):
 		self.contract_details[reqId] = contractDetails
@@ -34,6 +34,7 @@ class IBapi(EWrapper, EClient):
 	def get_contract_details(self, reqId, contract):
 		self.contract_details[reqId] = None
 		self.reqContractDetails(reqId, contract)
+
 		for err_check in range(50):
 			if not self.contract_details[reqId]:
 				time.sleep(0.1)
@@ -42,6 +43,7 @@ class IBapi(EWrapper, EClient):
 
 		if err_check == 49:
 			raise Exception('error getting contract details')
+
 		return app.contract_details[reqId].contract
 
 def initAPI():
