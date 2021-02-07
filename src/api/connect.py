@@ -47,11 +47,9 @@ def initAPI():
 	app = IBapi()
 	app.connect('127.0.0.1', 7497, 123)
 	app.nextorderId = None
-
 	thread_exec = lambda: app.run()
 	api_thread = threading.Thread(target=thread_exec, daemon=True)
 	api_thread.start()
-
 	while not isinstance(app.nextorderId, int):
 		print('Waiting For Connection...')
 		time.sleep(1)
