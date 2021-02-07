@@ -16,10 +16,9 @@ class IBapi(EWrapper, EClient):
 	def nextValidId(self, orderId: int):
 		super().nextValidId(orderId)
 		self.nextorderId = orderId
-		print('The next valid order id is: {}'.format(self.nextorderId))
 	
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
-		print('Order status ~ #{} \n\t Status : {} \n\t Filled : {} \n\t Remaining : {} \n\t Last Fill Price : {}'.format(orderId, status, remaining, remaining, lastFillPrice))
+		print(f'Order {status} ~ #{orderId}')
 	
 	def openOrder(self, orderId, contract, order, orderState):
 		print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
@@ -42,7 +41,6 @@ class IBapi(EWrapper, EClient):
 				break
 		if err_check == 49:
 			raise Exception('error getting contract details')
-
 		return app.contract_details[reqId].contract
 
 def initAPI():
