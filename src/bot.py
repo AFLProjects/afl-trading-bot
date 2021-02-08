@@ -27,17 +27,20 @@ with open('bot.csv', newline='') as csvfile:
 dft_output = denoise(graph, .85)
 graph_cpy = denoise([graph[i] for i in range(len(graph))], .95)
 graph_cpy_2 = [graph_cpy[i] for i in range(len(graph))]
-res = determineResistance(graph_cpy, .05)
-sup = determineSupport(graph_cpy_2, .05)
+res = determineHorizontalResistance(graph_cpy, .05)
+sup = determineHorizontalSupport(graph_cpy_2, .05)
+sma = determineMovingAverage(graph, 20)
 
 plt.subplot(1,2,1)
-plt.plot(graph)
-plt.axhline(y=res, color='black', linestyle='-')
-plt.axhline(y=sup, color='black', linestyle='-')
+plt.plot(graph, color='#4285F4')
+plt.plot(sma, color='#0F9D58')
+plt.axhline(y=res, color='#DB4437', linestyle='-')
+plt.axhline(y=sup, color='#DB4437', linestyle='-')
 plt.subplot(1,2,2)
-plt.plot(dft_output)
-plt.axhline(y=res, color='black', linestyle='-')
-plt.axhline(y=sup, color='black', linestyle='-')
+plt.plot(dft_output, color='#4285F4')
+plt.plot(sma, color='#0F9D58')
+plt.axhline(y=res, color='#DB4437', linestyle='-')
+plt.axhline(y=sup, color='#DB4437', linestyle='-')
 """
 money = 1000
 moneyOld = 0

@@ -2,7 +2,11 @@ from dft.dft import *
 from dft.denoise import *
 from math import *
 
-def determineResistance(graph, threshold):
+# Determine market resitance
+# If market breaks resistance it is likely to grow
+# The resistance line is now likely to be the new support line
+# Sometimes => false breakout
+def determineHorizontalResistance(graph, threshold):
 	maxValue = max(graph)
 	average = 0.0
 	count = 0.0
@@ -11,11 +15,15 @@ def determineResistance(graph, threshold):
 			count += 1.0
 			average += value
 	average /= count
-	graph.remove(maxValue)
-	return average if count >= 2 else determineResistance(graph, threshold)
+	graph = graph.remove(maxValue)
+	return average if count >= 2 else determineHorizontalResistance(graph, threshold)
 		
 
-def determineSupport(graph, threshold):
+# Determine market support
+# If market breaks support it is likely to decrease
+# The support line is now likely to be the new resistance line
+# Sometimes => false breakout
+def determineHorizontalSupport(graph, threshold):
 	minValue = min(graph)
 	average = 0.0
 	count = 0.0
@@ -24,6 +32,9 @@ def determineSupport(graph, threshold):
 			count += 1.0
 			average += value
 	average /= count
-	graph.remove(minValue)
-	return average if count >= 2 else determineSupport(graph, threshold)
+	graph = graph.remove(minValue)
+	return average if count >= 2 else determineHorizontalSupport(graph, threshold)
 
+def determineMovingAverage(graph, window_size):
+	L = len(graph) - window_size + 1
+	return [sum(graph[i : i + window_size]) / window_size for i in range(L)]
