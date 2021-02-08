@@ -10,12 +10,10 @@ def determineResistance(graph, threshold):
 		if value >= maxValue * (1 - threshold) and value <= maxValue * (1 + threshold):
 			count += 1.0
 			average += value
-	if count >= 2:
-		average /= count
-		return average
-	else:
-		graph.remove(maxValue)
-		determineResistance(graph, threshold)
+	average /= count
+	graph.remove(maxValue)
+	return average if count >= 2 else determineResistance(graph, threshold)
+		
 
 def determineSupport(graph, threshold):
 	minValue = min(graph)
@@ -25,10 +23,7 @@ def determineSupport(graph, threshold):
 		if value >= minValue * (1 - threshold) and value <= minValue * (1 + threshold):
 			count += 1.0
 			average += value
-	if count >= 2:
-		average /= count
-		return average
-	else:
-		graph.remove(minValue)
-		determineSupport(graph, threshold)
+	average /= count
+	graph.remove(minValue)
+	return average if count >= 2 else determineSupport(graph, threshold)
 
