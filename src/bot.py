@@ -24,23 +24,28 @@ with open('bot.csv', newline='') as csvfile:
         if i > 0:
             graph.append(float((', '.join(row)).split(',')[1]))
 
-dft_output = denoise(graph, .85)
-graph_cpy = denoise([graph[i] for i in range(len(graph))], .95)
-graph_cpy_2 = [graph_cpy[i] for i in range(len(graph))]
-res = determineHorizontalResistance(graph_cpy, .05)
-sup = determineHorizontalSupport(graph_cpy_2, .05)
+den = denoise(graph, .85)
+dft_output = den[0]
+graph_cpy = [den[1][i] for i in range(len(den[1]))]
+graph_cpy_2 = [den[2][i] for i in range(len(den[2]))]
+res = determineHorizontalResistance(graph_cpy, .1)
+sup = determineHorizontalSupport(graph_cpy_2, .1)
 sma = determineMovingAverage(graph, 20)
 
 plt.subplot(1,2,1)
 plt.plot(graph, color='#4285F4')
 plt.plot(sma, color='#0F9D58')
-plt.axhline(y=res, color='#DB4437', linestyle='-')
-plt.axhline(y=sup, color='#DB4437', linestyle='-')
+plt.axhline(y=res[0], color='gray', linestyle='-')
+plt.axhline(y=res[1], color='black', linestyle='-')
+plt.axhline(y=sup[1], color='gray', linestyle='-')
+plt.axhline(y=sup[0], color='black', linestyle='-')
 plt.subplot(1,2,2)
 plt.plot(dft_output, color='#4285F4')
 plt.plot(sma, color='#0F9D58')
-plt.axhline(y=res, color='#DB4437', linestyle='-')
-plt.axhline(y=sup, color='#DB4437', linestyle='-')
+plt.axhline(y=res[0], color='gray', linestyle='-')
+plt.axhline(y=res[1], color='black', linestyle='-')
+plt.axhline(y=sup[1], color='gray', linestyle='-')
+plt.axhline(y=sup[0], color='black', linestyle='-')
 """
 money = 1000
 moneyOld = 0

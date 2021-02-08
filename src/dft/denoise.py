@@ -48,6 +48,8 @@ def denoise(graph, _threshold_):
     interpolation = Array(0, N)     # Interpolated spikes
     previousSpike = [graph[0], 0]   # Prevous spike
     spikes = Array(0, 1)            # Spikes on DFT
+    newSpikesUp = Array(0, 0)
+    newSpikesDown = Array(0, 0)
 
     # Determine corresponding spikes on the graph and interpolate
     for i, value in enumerate(out):
@@ -59,6 +61,7 @@ def denoise(graph, _threshold_):
                     point = _max_(graph, spikes[L-3], spikes[L-1])
                     linearInterpolation(interpolation, previousSpike, point)
                     previousSpike = point
+                    newSpikesUp.append(previousSpike[0])
             elif value - out[i-1] > 0 and out[i+1] - value < 0:
                 spikes.append(i)
                 L = len(spikes)
@@ -66,12 +69,15 @@ def denoise(graph, _threshold_):
                     point = _min_(graph, spikes[L-3], spikes[L-1])
                     linearInterpolation(interpolation, previousSpike, point)
                     previousSpike = point
+                    newSpikesDown.append(previousSpike[0])
         if i == N-1:
             point = [out[spikes[len(spikes)-1]], spikes[len(spikes)-1]]
             if out[point[1]] - out[point[1]-1] > 0 and out[point[1]+1] - out[point[1]] < 0:
                 point = _max_(graph, previousSpike[1], N-1)
+                newSpikesDown.append(previousSpike[0])
             else:
                 point = _min_(graph, previousSpike[1], N-1)
+                newSpikesUp.append(previousSpike[0])
             spikes.append(point[1])
             linearInterpolation(interpolation, previousSpike, point)
             previousSpike = point
@@ -79,7 +85,7 @@ def denoise(graph, _threshold_):
             for j in range(previousSpike[1], point[1]+1):
                 dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
                 interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
-    return interpolation
+    return [interpolation,newSpikesUp,newSpikesDown]
 
         
     
