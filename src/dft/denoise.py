@@ -1,6 +1,5 @@
 """ Simplify and denoise graphs using Discrete Fourier Transform """
 from dft import dft
-import matplotlib.pyplot as plt
 from math import *
 
 # Find greatest value in an array within a range
