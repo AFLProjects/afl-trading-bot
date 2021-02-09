@@ -1,12 +1,16 @@
 import urllib.request
+import yfinance as yf 
+import math  
 
-def getStockPrice(stock):
-	html = ""
-	with urllib.request.urlopen('https://finance.yahoo.com/quote/{}?p={}'.format(stock, stock)) as f:
-	    html = f.read().decode('utf-8')
-	html = html.split('My(6px) Pos(r) smartphone_Mt(6px)',1)[1];
-	html = html.split('<span',1)[1];
-	html = html.split('>',1)[1];
-	html = html.split('</span>',1)[0];
-	html = float(html.replace(',',''))
-	return html
+def getStockPriceHistory(stock, interval, dateStart, dateEnd):
+	data = yf.download(stock, dateStart, dateEnd, interval = interval)['Close']
+	graph = []
+	for i, value in enumerate(data):
+		if not math.isnan(value):
+			graph.append(value)
+	return graph
+
+def getCurrentPrice(symbol):
+    ticker = yf.Ticker(symbol)
+    todays_data = ticker.history(period='1d')
+    return todays_data['Close'][0]

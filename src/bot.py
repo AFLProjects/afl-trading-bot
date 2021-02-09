@@ -1,7 +1,6 @@
 # Libraries to download
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-import yfinance as yf   
 
 # Project Files
 from api.connect import *
@@ -12,82 +11,39 @@ from dft.denoise import *
 from analysis.analyse import *
 
 # System libraries
+import urllib.request
 import time
 import csv
 import os
 
-"""
-_API_ = initAPI()
-contract = IBStockContract('BABA')
-order = IBMarketOrder('SELL', 10)
-_API_.placeOrder(_API_.nextorderId, contract, order)
-print(getStockPrice('BABA'))
-"""
-
-# Get the data for the stock Apple by specifying the stock ticker, start date, and end date 
-data = yf.download('AAPL','2021-02-04','2021-02-09', interval = "1m") 
-graph = [(data['Close'][i] if not math.isnan(data['Close'][i]) else data['Close'][i+1]) for i in range(len(data['Close'])-1)]
-
-"""
-graph = []
-with open('bot.csv', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-    for i,row in enumerate(spamreader):
-        if i > 0:
-            graph.append(float((', '.join(row)).split(',')[1]))
-
-"""
-den = denoise(graph, .95)
-dft_output = den[0]
-graph_cpy = [den[1][i] for i in range(len(den[1]))]
-graph_cpy_2 = [den[2][i] for i in range(len(den[2]))]
-res = determineHorizontalResistance(graph_cpy, (max(graph)-min(graph)) * .1)
-sup = determineHorizontalSupport(graph_cpy_2, (max(graph)-min(graph)) * .1)
-sma50 = determineMovingAverage(graph, 50)
-sma150 = determineMovingAverage(graph, 150)
-sma200 = determineMovingAverage(graph, 200)
-trends = detectTrends(den[2],den[4], len(graph))
-
-#sb1 = plt.subplot(1,2,1)
-sb1 = plt.subplot(1,2,1)
-for i in range(len(trends)):
-    if trends[i][2] == 1:
-        sb1.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#0F9D58'))
-    else:
-        sb1.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#DB4437'))
-plt.plot(graph, color='black')
-#plt.plot(sma50, color='#0F9D58')
-#plt.plot(sma150, color='#F4B400')
-#plt.plot(sma200, color='#DB4437')
-
-if res[0] != -1:
-    plt.axhline(y=res[1], color='#F4B400', linestyle='-')
-    #plt.axhline(y=res[1], color='black', linestyle='-')
-if sup[0] != -1:
-    plt.axhline(y=sup[0], color='#F4B400', linestyle='-')
-    #plt.axhline(y=sup[0], color='black', linestyle='-')
-
-sb2 = plt.subplot(1,2,2)
-for i in range(len(trends)):
-    if trends[i][2] == 1:
-        sb2.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#0F9D58'))
-    else:
-        sb2.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#DB4437'))
-plt.plot(dft_output, color='black')
-
-#plt.plot(sma50, color='#0F9D58')
-#plt.plot(sma150, color='#F4B400')
-#plt.plot(sma200, color='#DB4437')
-"""
-if res[0] != -1:
-    plt.axhline(y=res[0], color='gray', linestyle='-')
-    plt.axhline(y=res[1], color='black', linestyle='-')
-if sup[0] != -1:
-    plt.axhline(y=sup[1], color='gray', linestyle='-')
-    plt.axhline(y=sup[0], color='black', linestyle='-')
-"""
-plt.show()
+index = 1
+markets = []
+print('Fectching trending markets...')
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+urllib.request.install_opener(opener)
+for i in range(9):
+    time.sleep(1)
+    try:
+        url = f'https://finviz.com/screener.ashx?v=210&s=ta_p_tlsupport&r={index}'
+        print(f'[\'url\' : \'{url}\']')
+        with urllib.request.urlopen(url) as f:
+            html = f.read().decode('utf-8')
+            parse = (html.split('<!-- TS')[1]).split('TE -->')[0]
+            for i, value in enumerate(parse.splitlines()):
+                ticker = value.split('|')[0]
+                if ticker:
+                    markets.append(ticker)
+            index += 12
+    except:
+        print('No more markets')
+        break
+print(f"Found {len(markets)} markets with an uptrend.")
+print(markets)
 
 
-os.system("pause")
 
+while True:
+    getCurrentPrice('AAPL')
+
+#https://finviz.com/screener.ashx?v=210&s=ta_p_tlsupport&r=1
