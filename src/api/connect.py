@@ -20,9 +20,9 @@ class IBapi(EWrapper, EClient):
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
 		print(f'Order {status} ~ #{orderId}')
 	
-	def openOrder(self, orderId, contract, order, orderState):
-		print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
-			orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
+	#def openOrder(self, orderId, contract, order, orderState):
+		#print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
+			#orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
 	
 	def execDetails(self, reqId, contract, execution):
 		print('Order Executed ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Currency : {} \n\t Execution ID : {} \n\t Order ID : {}\n\t Shares : {} \n\t Last Liquidity : {}'.format(

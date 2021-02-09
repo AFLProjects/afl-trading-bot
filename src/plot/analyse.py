@@ -9,11 +9,13 @@ from math import *
 # The trend will probably change
 # Sometimes => false breakout
 def determineHorizontalResistance(graph, threshold):
+	if len(graph) < 1:
+		return (-1,-1)
 	maxValue = max(graph)
 	minValue = maxValue
 	count = 0
 	for i, value in enumerate(graph):
-		if value >= maxValue * (1 - threshold) and value <= maxValue * (1 + threshold):
+		if value >= maxValue - threshold and value <= maxValue + threshold:
 			count += 1.0
 			if value <= minValue:
 				minValue = value
@@ -27,11 +29,13 @@ def determineHorizontalResistance(graph, threshold):
 # The trend will probably change
 # Sometimes => false breakout
 def determineHorizontalSupport(graph, threshold):
+	if len(graph) < 1:
+		return (-1,-1)
 	minValue = min(graph)
 	maxValue = minValue
 	count = 0
 	for i, value in enumerate(graph):
-		if value >= minValue * (1 - threshold) and value <= minValue * (1 + threshold):
+		if value >= minValue - threshold and value <= minValue + threshold:
 			count += 1.0
 			if value > maxValue:
 				maxValue = value
@@ -39,9 +43,9 @@ def determineHorizontalSupport(graph, threshold):
 	return (minValue,maxValue) if count > 2 else determineHorizontalSupport(graph, threshold)
 
 """
+Detect trends (cut the graph and check if the highs are increasing or not)
 Add non horizontal resistance/support lines on uptrend or downtrend markets
 """
-
 def determineMovingAverage(graph, window_size):
 	L = len(graph) - window_size + 1
-	return [sum(graph[i : i + window_size]) / window_size for i in range(L)]
+	return ([0]*(window_size+1)) + ([sum(graph[i : i + window_size]) / window_size for i in range(L)])
