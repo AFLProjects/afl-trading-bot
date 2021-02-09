@@ -1,5 +1,6 @@
 # Libraries to download
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 import yfinance as yf   
 
 # Project Files
@@ -24,7 +25,7 @@ print(getStockPrice('BABA'))
 """
 
 # Get the data for the stock Apple by specifying the stock ticker, start date, and end date 
-data = yf.download('AAPL','2021-02-06','2021-02-09', interval = "1m") 
+data = yf.download('AAPL','2021-02-04','2021-02-09', interval = "1m") 
 graph = [(data['Close'][i] if not math.isnan(data['Close'][i]) else data['Close'][i+1]) for i in range(len(data['Close'])-1)]
 
 """
@@ -45,31 +46,46 @@ sup = determineHorizontalSupport(graph_cpy_2, (max(graph)-min(graph)) * .1)
 sma50 = determineMovingAverage(graph, 50)
 sma150 = determineMovingAverage(graph, 150)
 sma200 = determineMovingAverage(graph, 200)
+trends = detectTrends(den[2],den[4], len(graph))
 
-
-plt.subplot(1,2,1)
-plt.plot(graph, color='#4285F4')
+#sb1 = plt.subplot(1,2,1)
+sb1 = plt.subplot(1,2,1)
+for i in range(len(trends)):
+    if trends[i][2] == 1:
+        sb1.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#0F9D58'))
+    else:
+        sb1.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#DB4437'))
+plt.plot(graph, color='black')
 #plt.plot(sma50, color='#0F9D58')
 #plt.plot(sma150, color='#F4B400')
 #plt.plot(sma200, color='#DB4437')
+
+if res[0] != -1:
+    plt.axhline(y=res[1], color='#F4B400', linestyle='-')
+    #plt.axhline(y=res[1], color='black', linestyle='-')
+if sup[0] != -1:
+    plt.axhline(y=sup[0], color='#F4B400', linestyle='-')
+    #plt.axhline(y=sup[0], color='black', linestyle='-')
+
+sb2 = plt.subplot(1,2,2)
+for i in range(len(trends)):
+    if trends[i][2] == 1:
+        sb2.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#0F9D58'))
+    else:
+        sb2.add_patch(Rectangle((trends[i][0],min(dft_output)),trends[i][1]-trends[i][0],max(dft_output)-min(dft_output),color='#DB4437'))
+plt.plot(dft_output, color='black')
+
+#plt.plot(sma50, color='#0F9D58')
+#plt.plot(sma150, color='#F4B400')
+#plt.plot(sma200, color='#DB4437')
+"""
 if res[0] != -1:
     plt.axhline(y=res[0], color='gray', linestyle='-')
     plt.axhline(y=res[1], color='black', linestyle='-')
 if sup[0] != -1:
     plt.axhline(y=sup[1], color='gray', linestyle='-')
     plt.axhline(y=sup[0], color='black', linestyle='-')
-plt.subplot(1,2,2)
-plt.plot(dft_output, color='#4285F4')
-#plt.plot(sma50, color='#0F9D58')
-#plt.plot(sma150, color='#F4B400')
-#plt.plot(sma200, color='#DB4437')
-if res[0] != -1:
-    plt.axhline(y=res[0], color='gray', linestyle='-')
-    plt.axhline(y=res[1], color='black', linestyle='-')
-if sup[0] != -1:
-    plt.axhline(y=sup[1], color='gray', linestyle='-')
-    plt.axhline(y=sup[0], color='black', linestyle='-')
-
+"""
 plt.show()
 
 

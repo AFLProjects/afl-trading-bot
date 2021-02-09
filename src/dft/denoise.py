@@ -50,6 +50,8 @@ def denoise(graph, _threshold_):
     spikes = Array(0, 1)            # Spikes on DFT
     newSpikesUp = Array(0, 0)
     newSpikesDown = Array(0, 0)
+    newSpikesUpIndex = Array(0, 0)
+    newSpikesDownIndex = Array(0, 0)
 
     # Determine corresponding spikes on the graph and interpolate
     for i, value in enumerate(out):
@@ -62,6 +64,7 @@ def denoise(graph, _threshold_):
                     linearInterpolation(interpolation, previousSpike, point)
                     previousSpike = point
                     newSpikesUp.append(previousSpike[0])
+                    newSpikesUpIndex.append(previousSpike[1])
             elif value - out[i-1] > 0 and out[i+1] - value < 0:
                 spikes.append(i)
                 L = len(spikes)
@@ -70,14 +73,17 @@ def denoise(graph, _threshold_):
                     linearInterpolation(interpolation, previousSpike, point)
                     previousSpike = point
                     newSpikesDown.append(previousSpike[0])
+                    newSpikesDownIndex.append(previousSpike[1])
         if i == N-1:
             point = [out[spikes[len(spikes)-1]], spikes[len(spikes)-1]]
             if out[point[1]] - out[point[1]-1] > 0 and out[point[1]+1] - out[point[1]] < 0:
                 point = _max_(graph, previousSpike[1], N-1)
                 newSpikesDown.append(previousSpike[0])
+                newSpikesDownIndex.append(previousSpike[1])
             else:
                 point = _min_(graph, previousSpike[1], N-1)
                 newSpikesUp.append(previousSpike[0])
+                newSpikesUpIndex.append(previousSpike[1])
             spikes.append(point[1])
             linearInterpolation(interpolation, previousSpike, point)
             previousSpike = point
@@ -85,7 +91,77 @@ def denoise(graph, _threshold_):
             for j in range(previousSpike[1], point[1]+1):
                 dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
                 interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
-    return [interpolation,newSpikesUp,newSpikesDown]
+    return [interpolation,newSpikesUp, newSpikesDown, newSpikesUpIndex, newSpikesDownIndex]
+
+
+# Simplify graph curve, using Discrete Fourier Transform
+def denoise_index(graph, index):
+    # Create DFT from graph
+    dft_complex = dft(graph)
+    N = len(dft_complex)
+
+    # Sort data and determine threshold percentile
+    dft_graph_sorted  = [abs(dft_complex[i]) for i in range(N)]
+    dft_graph_sorted.sort()
+    threshold = dft_graph_sorted[len(dft_graph_sorted)-index-1]
+
+    # Apply filter on DFT
+    dft_inverse_filter = [complex(0,0)] * N
+    for i,c in enumerate(dft_complex):
+        if abs(c) >= threshold:
+            dft_inverse_filter[i] = c
+
+    # Restore graph from filtered DFT
+    out = dftinv(dft_inverse_filter)
+    out = [out[i].real for i in range(N)]
+
+    interpolation = Array(0, N)     # Interpolated spikes
+    previousSpike = [graph[0], 0]   # Prevous spike
+    spikes = Array(0, 1)            # Spikes on DFT
+    newSpikesUp = Array(0, 0)
+    newSpikesDown = Array(0, 0)
+    newSpikesUpIndex = Array(0, 0)
+    newSpikesDownIndex = Array(0, 0)
+
+    # Determine corresponding spikes on the graph and interpolate
+    for i, value in enumerate(out):
+        if i != 0 and i != N-1:
+            if value - out[i-1] < 0 and out[i+1] - value > 0:
+                spikes.append(i)
+                L = len(spikes)
+                if L > 2:
+                    point = _max_(graph, spikes[L-3], spikes[L-1])
+                    linearInterpolation(interpolation, previousSpike, point)
+                    previousSpike = point
+                    newSpikesUp.append(previousSpike[0])
+                    newSpikesUpIndex.append(previousSpike[1])
+            elif value - out[i-1] > 0 and out[i+1] - value < 0:
+                spikes.append(i)
+                L = len(spikes)
+                if L > 2:
+                    point = _min_(graph, spikes[L-3], spikes[L-1])
+                    linearInterpolation(interpolation, previousSpike, point)
+                    previousSpike = point
+                    newSpikesDown.append(previousSpike[0])
+                    newSpikesDownIndex.append(previousSpike[1])
+        if i == N-1:
+            point = [out[spikes[len(spikes)-1]], spikes[len(spikes)-1]]
+            if out[point[1]] - out[point[1]-1] > 0 and out[point[1]+1] - out[point[1]] < 0:
+                point = _max_(graph, previousSpike[1], N-1)
+                newSpikesDown.append(previousSpike[0])
+                newSpikesDownIndex.append(previousSpike[1])
+            else:
+                point = _min_(graph, previousSpike[1], N-1)
+                newSpikesUp.append(previousSpike[0])
+                newSpikesUpIndex.append(previousSpike[1])
+            spikes.append(point[1])
+            linearInterpolation(interpolation, previousSpike, point)
+            previousSpike = point
+            point = [graph[N-1], N-1]
+            for j in range(previousSpike[1], point[1]+1):
+                dj = (point[0] - previousSpike[0]) / (point[1] - previousSpike[1])
+                interpolation[j] = previousSpike[0] + (j - previousSpike[1]) * dj
+    return [interpolation,newSpikesUp, newSpikesDown, newSpikesUpIndex, newSpikesDownIndex]
 
         
     

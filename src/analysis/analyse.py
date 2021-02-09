@@ -49,3 +49,38 @@ Add non horizontal resistance/support lines on uptrend or downtrend markets
 def determineMovingAverage(graph, window_size):
 	L = len(graph) - window_size + 1
 	return ([0]*(window_size+1)) + ([sum(graph[i : i + window_size]) / window_size for i in range(L)])
+
+
+def detectTrends(up_points, up_points_index, fullLength):
+	trend = 1 if up_points[1]-up_points[0] > 0 else -1
+	start = 0
+	end = 0
+	trends = []
+	currentCount = 0
+	for i in range(len(up_points)-1):
+		if up_points[i+1] - up_points[i] >= 0:
+			if trend == 1:
+				end = up_points_index[i+1]
+				currentCount += 1
+			else:
+				#print(currentCount)
+				t = trend if currentCount > 2 or len(trends) < 1 else trends[len(trends)-1][2]
+				trends.append((start,end,trend))
+				trend = 1
+				start = up_points_index[i]
+				end = up_points_index[i+1]
+				currentCount = 1
+		else:
+			if trend == -1:
+				end = up_points_index[i+1]
+				currentCount += 1
+			else:
+				#print(currentCount)
+				t = trend if currentCount > 2 or len(trends) < 1 else trends[len(trends)-1][2]
+				trends.append((start,end,t))
+				trend = -1
+				start = up_points_index[i]
+				end = up_points_index[i+1]
+				currentCount = 1
+	trends.append((start,fullLength-1,trend))
+	return trends
