@@ -1,17 +1,19 @@
+# Libraries to download
 import matplotlib.pyplot as plt
 import yfinance as yf   
 
+# Project Files
 from api.connect import *
 from api.order import *
 from api.tracking import *
-from dft.dft import *
-from dft.denoise import *
-from plot.analyse import *
+from analysis.fourier.dft import *
+from analysis.fourier.denoise import *
+from analysis.technical.analyse import *
 
+# System libraries
 import time
 import csv
 import os
-
 
 """
 _API_ = initAPI()
