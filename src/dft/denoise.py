@@ -1,5 +1,5 @@
 """ Simplify and denoise graphs using Discrete Fourier Transform """
-from analysis.fourier.dft import *
+from dft.dft import *
 from math import *
 
 # Find greatest value in an array within a range

@@ -6,9 +6,9 @@ import yfinance as yf
 from api.connect import *
 from api.order import *
 from api.tracking import *
-from analysis.fourier.dft import *
-from analysis.fourier.denoise import *
-from analysis.technical.analyse import *
+from dft.dft import *
+from dft.denoise import *
+from analysis.analyse import *
 
 # System libraries
 import time

@@ -1,5 +1,5 @@
-from analysis.fourier.denoise import *
-from analysis.technical.analyse import *
+from dft.denoise import *
+from analysis.analyse import *
 from math import *
 
 # Only on constant trends
