@@ -25,7 +25,7 @@ modules = [
 ]
 
 # Check for modules
-std2.write_line('Checking for modules and installing them...')
+std2.write_line('Checking for modules...')
 for i, module in enumerate(modules):
 	std2.write_progress_bar(i+1, len(modules), 40)
 	with std2.suppress_stdout():

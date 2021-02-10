@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from math import *
-import os, sys
+import os, sys, time
 
 @contextmanager
 def suppress_stdout():
@@ -32,3 +32,8 @@ def write_progress_bar(i, m, toolbar_width):
     if i == m:
     	sys.stdout.write('\n')
     sys.stdout.flush()
+
+def pause_progress_bar(seconds):
+    for i in range(seconds * 100):
+        time.sleep(seconds / 100)
+        write_progress_bar(i+1, seconds * 100, 40)

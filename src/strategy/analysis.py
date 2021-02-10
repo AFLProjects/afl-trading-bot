@@ -1,5 +1,4 @@
 from dft.denoise import *
-from analysis.analyse import *
 from math import *
 
 def determineMovingAverage(graph, window_size):

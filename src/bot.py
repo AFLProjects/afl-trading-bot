@@ -7,7 +7,7 @@ from api.order import *
 from api.tracking import *
 from dft.dft import *
 from dft.denoise import *
-from analysis.analyse import *
+from strategy.analysis import *
 import utils.stdout2 as std2
 
 # System libraries
@@ -29,12 +29,11 @@ index = 1
 std2.write_line('Fectching trending markets...')
 size = 0
 while fecthMarkets:
-    time.sleep(.5)
     try:
         url = f'https://finviz.com/screener.ashx?v=210&s=ta_p_tlsupport&r={index}'
         with urllib.request.urlopen(url) as f:
             html = f.read().decode('utf-8')
-            std2.write_progress_bar(1, 1, 40)
+            std2.pause_progress_bar(1)
             std2.write_line(f'[{sys.getsizeof(html)} bytes] Downloaded market data from {url}')
             parse = (html.split('<!-- TS')[1]).split('TE -->')[0]
             for i, value in enumerate(parse.splitlines()):
@@ -87,15 +86,7 @@ except IOError:
     f = open("logs.txt", "x")
     f.write("0")
     f.close()
-
 std2.write_line(f'Found a total of {len(markets)} markets to analyse within the next hour !')
-for i, symbol in enumerate(markets):
-    if i < len(markets)-1:
-        std2.write(symbol + ',')
-    else:
-        std2.write(symbol + "\n")
 
-
-# Pause
-while True:
-    time.sleep(0.1)
+# Exit
+pause = input('Press a key to exit.')
