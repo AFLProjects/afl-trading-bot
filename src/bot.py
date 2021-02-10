@@ -97,6 +97,6 @@ def print_trade(symbol, price, action):
     std2.write_autocomplete(action, 14)
 std2.write_line('Time          Symbol        Price         Action')
 std2.write_line('------------  ------------  ------------  ------------')
-print_trade('APPL', '1.12', 'BUY')
+
 # Exit
 pause = input('Press a key to exit.')
