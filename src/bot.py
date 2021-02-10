@@ -68,7 +68,7 @@ for i, symbol in enumerate(markets):
 std2.write_line(f'[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets')
 
 # Fetch previously used markets
-std2.write_line('Fectching previously used markets...')
+std2.write_line('Finding previously used markets...')
 try:
     with open('logs.txt') as f:
         content = f.readlines()
@@ -88,5 +88,15 @@ except IOError:
     f.close()
 std2.write_line(f'Found a total of {len(markets)} markets to analyse within the next hour !')
 
+# Searching for trades
+def print_trade(symbol, price, action):
+    time_str = time.strftime("%H:%M:%S", time.gmtime(time.time()))
+    std2.write_autocomplete(time_str, 14)
+    std2.write_autocomplete(symbol, 14)
+    std2.write_autocomplete(price, 14)
+    std2.write_autocomplete(action, 14)
+std2.write_line('Time          Symbol        Price         Action')
+std2.write_line('------------  ------------  ------------  ------------')
+print_trade('APPL', '1.12', 'BUY')
 # Exit
 pause = input('Press a key to exit.')

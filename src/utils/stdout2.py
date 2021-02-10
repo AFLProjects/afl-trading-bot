@@ -12,13 +12,21 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def write(str):
-	sys.stdout.write(str)
+def write(str, start='', end=''):
+	sys.stdout.write(start + str + end)
 	sys.stdout.flush()
 
-def write_line(str):
-	sys.stdout.write(str + "\n")
+def write_line(str, start='', end=''):
+	sys.stdout.write(start + str + "\n" + end)
 	sys.stdout.flush()
+
+def write_autocomplete(str, length):
+    sys.stdout.write(str + " " * (length - len(str)))
+    sys.stdout.flush()
+
+def write_line_autocomplete(str, length):
+    sys.stdout.write(str + " " * (length - len(str)) + "\n")
+    sys.stdout.flush()
    
 def write_progress_bar(i, m, toolbar_width):
     p = f'{round(i / m * 100)}.'
