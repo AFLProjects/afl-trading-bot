@@ -14,6 +14,7 @@ import utils.stdout2 as std2
 from datetime import date, timedelta
 import time, csv, os, sys
 import urllib.request
+import signal, multiprocessing
 
 # Setup user-agent
 opener = urllib.request.build_opener()
@@ -57,15 +58,19 @@ size = 0
 
 # Fetch Market History
 std2.write_line('Fectching market history...')
+errorMsgBuffer = ''
 for i, symbol in enumerate(markets):
     std2.write_progress_bar(i+1, len(markets), 40)
     endDate = date.today().strftime("%Y-%m-%d")
     startDate = (date.today() - timedelta(days=365)).strftime("%Y-%m-%d")
     with std2.suppress_stdout():
-        marketHistory[symbol] = getStockPriceHistory(symbol, '1d', startDate, endDate)
-    dataPoints += len(marketHistory[symbol])
-    size += sys.getsizeof(marketHistory[symbol])
-std2.write_line(f'[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets')
+        try:
+            marketHistory[symbol] = getStockPriceHistory(symbol, '1d', startDate, endDate)
+            dataPoints += len(marketHistory[symbol])
+            size += sys.getsizeof(marketHistory[symbol])
+        except:
+            errorMsgBuffer += f'[Exception] Couldn\'t download data for {symbol} !\n'
+std2.write_line(f'{errorMsgBuffer}[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets')
 
 # Fetch previously used markets
 std2.write_line('Finding previously used markets...')
@@ -97,6 +102,36 @@ def print_trade(symbol, price, action):
     std2.write_autocomplete(action, 14)
 std2.write_line('Time          Symbol        Price         Action')
 std2.write_line('------------  ------------  ------------  ------------')
+
+# Analyze data
+for i, symbol in enumerate(markets):
+    data = marketHistory[symbol]
+    for i, symbol in enumerate(markets):
+        if symbol in marketHistory and len(marketHistory[symbol]) > 200:
+            data = marketHistory[symbol]
+            #plt.figure(i+1)
+            #plt.subplot(1,2,1)
+            #plt.plot(data, color='blue')
+            _EMA_200_ = EMA(data,200)
+            _EMA_50_ = EMA(data,50)
+            #plt.plot(_EMA_200_, color='red')
+            #plt.plot(_EMA_50_, color='green')
+            #plt.subplot(1,2,2)
+            #_RSI_ = RSI(data,10)
+            #plt.plot(_RSI_, color='black')
+            #plt.show()
+            if data[now] > _EMA_[now] and abs(_EMA_200_-_EMA_50_) < .01 * max(data):
+                std2.write_line(f'[{symbol}] Potential BUY at {data[now]}USD')
+            elif data[now] < _EMA_[now] and abs(_EMA_200_-_EMA_50_) < .01 * max(data):
+                std2.write_line(f'[{symbol}] Potential SELL at {data[now]}USD')
+
+            """
+            now = len(data) - 1
+            if data[now] > _EMA_[now] and _RSI_[now] < 30:
+                std2.write_line(f'[{symbol}] Potential BUY at {data[now]}USD')
+            elif data[now] < _EMA_[now] and _RSI_[now] > 70:
+                std2.write_line(f'[{symbol}] Potential SELL at {data[now]}USD')
+            """
 
 # Exit
 pause = input('Press a key to exit.')

@@ -15,13 +15,14 @@ modules = [
 	"yfinance", 
 	"datetime", 
 	"time", 
-	"time", 
+	"signal", 
 	"csv", 
 	"os", 
 	"sys", 
 	"urllib", 
 	"math", 
-	"requests"
+	"requests",
+	"multiprocessing"
 ]
 
 # Check for modules
