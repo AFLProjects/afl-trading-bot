@@ -17,9 +17,12 @@ import urllib.request
 import signal, multiprocessing
 
 # Setup user-agent
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
-urllib.request.install_opener(opener)
+try:
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+    urllib.request.install_opener(opener)
+except:
+    std2.write_line('[Exception] Installing Opener failed => Downloading data migth not work')
 
 # Market data
 fecthMarkets = True
@@ -35,7 +38,7 @@ while fecthMarkets:
         with urllib.request.urlopen(url) as f:
             html = f.read().decode('utf-8')
             std2.pause_progress_bar(1)
-            std2.write_line(f'[{sys.getsizeof(html)} bytes] Downloaded market data from {url}')
+            std2.write_line(f'[{sys.getsizeof(html)} bytes] {url}')
             parse = (html.split('<!-- TS')[1]).split('TE -->')[0]
             for i, value in enumerate(parse.splitlines()):
                 ticker = value.split('|')[0]
@@ -100,38 +103,28 @@ def print_trade(symbol, price, action):
     std2.write_autocomplete(symbol, 14)
     std2.write_autocomplete(price, 14)
     std2.write_autocomplete(action, 14)
-std2.write_line('Time          Symbol        Price         Action')
+    std2.write('\n')
+std2.write_line('\nTime          Symbol        Price         Action')
 std2.write_line('------------  ------------  ------------  ------------')
 
 # Analyze data
 for i, symbol in enumerate(markets):
-    data = marketHistory[symbol]
-    for i, symbol in enumerate(markets):
-        if symbol in marketHistory and len(marketHistory[symbol]) > 200:
-            data = marketHistory[symbol]
-            #plt.figure(i+1)
-            #plt.subplot(1,2,1)
-            #plt.plot(data, color='blue')
-            _EMA_200_ = EMA(data,200)
-            _EMA_50_ = EMA(data,50)
-            #plt.plot(_EMA_200_, color='red')
-            #plt.plot(_EMA_50_, color='green')
-            #plt.subplot(1,2,2)
-            #_RSI_ = RSI(data,10)
-            #plt.plot(_RSI_, color='black')
-            #plt.show()
-            if data[now] > _EMA_[now] and abs(_EMA_200_-_EMA_50_) < .01 * max(data):
-                std2.write_line(f'[{symbol}] Potential BUY at {data[now]}USD')
-            elif data[now] < _EMA_[now] and abs(_EMA_200_-_EMA_50_) < .01 * max(data):
-                std2.write_line(f'[{symbol}] Potential SELL at {data[now]}USD')
-
-            """
-            now = len(data) - 1
-            if data[now] > _EMA_[now] and _RSI_[now] < 30:
-                std2.write_line(f'[{symbol}] Potential BUY at {data[now]}USD')
-            elif data[now] < _EMA_[now] and _RSI_[now] > 70:
-                std2.write_line(f'[{symbol}] Potential SELL at {data[now]}USD')
-            """
-
+    if symbol in marketHistory and len(marketHistory[symbol]) > 200:
+        data = marketHistory[symbol]
+        _EMA_200_ = EMA(data,200)
+        _EMA_50_ = EMA(data,50)
+        _RSI_ = RSI(data, 10)
+        now = len(_RSI_) - 1
+        if _RSI_[now] <= 20:
+            print_trade(symbol, str(round(data[now]*10000)/10000), 'BUY')
+        elif _RSI_[now] >= 80:
+            print_trade(symbol, str(round(data[now]*10000)/10000), 'SELL')
+        """plt.subplot(2,1,1)
+        plt.plot(data, color='black')
+        plt.plot(_EMA_200_, color='red')
+        plt.plot(_EMA_50_, color='green')
+        plt.subplot(2,1,2)
+        plt.plot(_RSI_, color='black')
+        plt.show()"""
 # Exit
-pause = input('Press a key to exit.')
+pause = input('\nPress a key to exit.')
