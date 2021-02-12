@@ -29,8 +29,8 @@ fecthMarkets = True
 markets = []
 index = 1
 
-# Fecth trending markets
-std2.write_line('Fectching trending markets...')
+# Fecth trending markets from Finviz
+std2.write_line('Finding trending markets from finviz...')
 size = 0
 while fecthMarkets:
     try:
@@ -52,7 +52,17 @@ while fecthMarkets:
     except:
         print('No more markets')
         break
-std2.write_line(f'[{size} bytes] Found {len(markets)} markets with an uptrend.')
+std2.write_line('\nFinding trending markets from yahoo...')
+url = f'https://finance.yahoo.com/trending-tickers/'
+with urllib.request.urlopen(url) as f:
+    htmlParse = f.read().decode('utf-8')
+    std2.pause_progress_bar(1)
+    while 'data-symbol=\"' in htmlParse:
+        htmlParse = htmlParse.split('data-symbol=\"', 1)[1]
+        market = htmlParse.split('\"', 1)[0]
+        if not market in markets:
+            markets.append(market)
+std2.write_line(f'\n[{size} bytes] Found {len(markets)} markets with an uptrend.\n')
 
 # History data
 marketHistory = {}
@@ -73,7 +83,7 @@ for i, symbol in enumerate(markets):
             size += sys.getsizeof(marketHistory[symbol])
         except:
             errorMsgBuffer += f'[Exception] Couldn\'t download data for {symbol} !\n'
-std2.write_line(f'{errorMsgBuffer}[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets')
+std2.write_line(f'{errorMsgBuffer}[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets\n')
 
 # Fetch previously used markets
 std2.write_line('Finding previously used markets...')
@@ -87,9 +97,9 @@ try:
                 market = content[i].split('|')[0]
                 if not market in markets:
                     markets.append(market)
-            std2.write_line(f'Found {logCount} previously used markets')
+            std2.write_line(f'\nFound {logCount} previously used markets')
         else:
-            std2.write_line('Found 0 previously used markets')
+            std2.write_line('\nFound 0 previously used markets')
 except IOError:
     f = open("logs.txt", "x")
     f.write("0")
@@ -126,5 +136,6 @@ for i, symbol in enumerate(markets):
         plt.subplot(2,1,2)
         plt.plot(_RSI_, color='black')
         plt.show()"""
+
 # Exit
 pause = input('\nPress a key to exit.')
