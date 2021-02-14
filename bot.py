@@ -79,7 +79,7 @@ errorMsgBuffer = ''
 for i, symbol in enumerate(markets):
     std2.write_progress_bar(i+1, len(markets), PROGRESS_BAR_SIZE)
     endDate = date.today().strftime(DATE_FORMAT)
-    startDate = (date.today() - timedelta(days=TIME_FRAME_DAYS)).strftime(DATE_FORMAT)
+    startDate = (date.today() - timedelta(days=10*TIME_FRAME_DAYS)).strftime(DATE_FORMAT)
     with std2.suppress_stdout():
         try:
             marketHistory[symbol] = getStockPriceHistory(symbol, '1d', startDate, endDate)
