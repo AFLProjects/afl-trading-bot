@@ -10,6 +10,7 @@ from dft.denoise import *
 from strategy.analysis import *
 import utils.stdout2 as std2
 from constants import *
+from exceptions import *
 
 # System libraries
 from datetime import date, timedelta
@@ -24,6 +25,7 @@ try:
     urllib.request.install_opener(opener)
 except:
     std2.write_line(MSG_OPENER_FAILED)
+    raise UserAgentSetupError
 
 # Market data
 fecthMarkets = True
@@ -52,6 +54,7 @@ while fecthMarkets:
             index += 12
     except:
         print(MSG_FETCHING_FAILED)
+        raise DownloadException
         break
 std2.write_line('\nFinding trending markets from yahoo...')
 url = URL_YAHOO
@@ -67,6 +70,7 @@ try:
     std2.write_line(f'\n[{size} bytes] Found {len(markets)} markets with an uptrend.\n')
 except:
     std2.write_line(MSG_FETCHING_FAILED)
+    raise DownloadException
     
 # History data
 marketHistory = {}
@@ -105,9 +109,13 @@ try:
         else:
             std2.write_line('\nFound 0 previously used markets')
 except IOError:
-    f = open(FILE_LOGS, FILE_CREATE)
-    f.write("0")
-    f.close()
+    try:
+        f = open(FILE_LOGS, FILE_CREATE)
+        f.write("0")
+        f.close()
+    except:
+        raise FileError
+
 std2.write_line(f'Found a total of {len(markets)} markets to analyse within the next hour !')
 
 # Searching for trades
@@ -137,10 +145,13 @@ amount = 0
 money = 0
 for i, symbol in enumerate(markets):
     if symbol in marketHistory and len(marketHistory[symbol]) > MIN_DATA_PTS:
-        data = marketHistory[symbol]
-        EMA1 = EMA(data, DEFAULT_EMA_1)
-        EMA2 = EMA(data, DEFAULT_EMA_2)
-        _RSI_ = RSI(data, DEFAULT_RSI_1)
+        try:
+            data = marketHistory[symbol]
+            EMA1 = EMA(data, DEFAULT_EMA_1)
+            EMA2 = EMA(data, DEFAULT_EMA_2)
+            _RSI_ = RSI(data, DEFAULT_RSI_1)
+        except:
+            raise DataError
         #now = len(_RSI_) - 1
         action = 'None'
         previousBuy = -1
