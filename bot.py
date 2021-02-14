@@ -9,6 +9,7 @@ from dft.dft import *
 from dft.denoise import *
 from strategy.analysis import *
 import utils.stdout2 as std2
+from constants import *
 
 # System libraries
 from datetime import date, timedelta
@@ -19,10 +20,10 @@ import signal, multiprocessing
 # Setup user-agent
 try:
     opener = urllib.request.build_opener()
-    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+    opener.addheaders = [('User-Agent', DEFAULT_USER_AGENT)]
     urllib.request.install_opener(opener)
 except:
-    std2.write_line('[Exception] Installing Opener failed => Downloading data migth not work')
+    std2.write_line(MSG_OPENER_FAILED)
 
 # Market data
 fecthMarkets = True
@@ -34,7 +35,7 @@ std2.write_line('Finding trending markets from finviz...')
 size = 0
 while fecthMarkets:
     try:
-        url = f'https://finviz.com/screener.ashx?v=210&s=ta_p_tlsupport&r={index}'
+        url = f'{URL_FINVIZ}{index}'
         with urllib.request.urlopen(url) as f:
             html = f.read().decode('utf-8')
             std2.pause_progress_bar(1)
@@ -50,20 +51,23 @@ while fecthMarkets:
             size += sys.getsizeof(html)
             index += 12
     except:
-        print('No more markets')
+        print(MSG_FETCHING_FAILED)
         break
 std2.write_line('\nFinding trending markets from yahoo...')
-url = f'https://finance.yahoo.com/trending-tickers/'
-with urllib.request.urlopen(url) as f:
-    htmlParse = f.read().decode('utf-8')
-    std2.pause_progress_bar(1)
-    while 'data-symbol=\"' in htmlParse:
-        htmlParse = htmlParse.split('data-symbol=\"', 1)[1]
-        market = htmlParse.split('\"', 1)[0]
-        if not market in markets:
-            markets.append(market)
-std2.write_line(f'\n[{size} bytes] Found {len(markets)} markets with an uptrend.\n')
-
+url = URL_YAHOO
+try:
+    with urllib.request.urlopen(url) as f:
+        htmlParse = f.read().decode('utf-8')
+        std2.pause_progress_bar(1)
+        while 'data-symbol=\"' in htmlParse:
+            htmlParse = htmlParse.split('data-symbol=\"', 1)[1]
+            market = htmlParse.split('\"', 1)[0]
+            if not market in markets:
+                markets.append(market)
+    std2.write_line(f'\n[{size} bytes] Found {len(markets)} markets with an uptrend.\n')
+except:
+    std2.write_line(MSG_FETCHING_FAILED)
+    
 # History data
 marketHistory = {}
 dataPoints = 0
@@ -73,9 +77,9 @@ size = 0
 std2.write_line('Fectching market history...')
 errorMsgBuffer = ''
 for i, symbol in enumerate(markets):
-    std2.write_progress_bar(i+1, len(markets), 40)
-    endDate = date.today().strftime("%Y-%m-%d")
-    startDate = (date.today() - timedelta(days=365)).strftime("%Y-%m-%d")
+    std2.write_progress_bar(i+1, len(markets), PROGRESS_BAR_SIZE)
+    endDate = date.today().strftime(DATE_FORMAT)
+    startDate = (date.today() - timedelta(days=TIME_FRAME_DAYS)).strftime(DATE_FORMAT)
     with std2.suppress_stdout():
         try:
             marketHistory[symbol] = getStockPriceHistory(symbol, '1d', startDate, endDate)
@@ -85,7 +89,7 @@ for i, symbol in enumerate(markets):
             errorMsgBuffer += f'[Exception] Couldn\'t download data for {symbol} !\n'
 std2.write_line(f'{errorMsgBuffer}[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets\n')
 
-# Fetch previously used markets
+# Find previously used markets
 std2.write_line('Finding previously used markets...')
 try:
     with open('logs.txt') as f:
@@ -93,7 +97,7 @@ try:
         logCount = int(content[0])
         if logCount > 0:
             for i in range(1, logCount + 1):
-                std2.write_progress_bar(i, logCount, 40)
+                std2.write_progress_bar(i, logCount, PROGRESS_BAR_SIZE)
                 market = content[i].split('|')[0]
                 if not market in markets:
                     markets.append(market)
@@ -101,41 +105,64 @@ try:
         else:
             std2.write_line('\nFound 0 previously used markets')
 except IOError:
-    f = open("logs.txt", "x")
+    f = open(FILE_LOGS, FILE_CREATE)
     f.write("0")
     f.close()
 std2.write_line(f'Found a total of {len(markets)} markets to analyse within the next hour !')
 
 # Searching for trades
 def print_trade(symbol, price, action):
-    time_str = time.strftime("%H:%M:%S", time.gmtime(time.time()))
-    std2.write_autocomplete(time_str, 14)
-    std2.write_autocomplete(symbol, 14)
-    std2.write_autocomplete(price, 14)
-    std2.write_autocomplete(action, 14)
+    time_str = time.strftime(TIME_FORMAT, time.gmtime(time.time()))
+    std2.write_autocomplete(time_str, AUTOCOMPLETE_LENGTH)
+    std2.write_autocomplete(symbol, AUTOCOMPLETE_LENGTH)
+    std2.write_autocomplete(price, AUTOCOMPLETE_LENGTH)
+    std2.write_autocomplete(action, AUTOCOMPLETE_LENGTH)
     std2.write('\n')
 std2.write_line('\nTime          Symbol        Price         Action')
 std2.write_line('------------  ------------  ------------  ------------')
 
 # Analyze data
+def print_data(data, EMA2, EMA1, _RSI_):
+    plt.subplot(2,1,1)
+    plt.plot(data, color=MAIN_CURVE_COLOR)
+    plt.plot(EMA1, color=EMA1_COLOR)
+    plt.plot(EMA2, color=EMA2_COLOR)
+    plt.subplot(2,1,2)
+    plt.plot(_RSI_, color=RSI_COLOR)
+    plt.axhline(y=MAX_RSI_SELL, color=RSI_MAX_COLOR, linestyle=LINE_STYLE)
+    plt.axhline(y=MIN_RSI_BUY, color=RSI_MIN_COLOR, linestyle=LINE_STYLE)
+    plt.show()
+wins = 0
+amount = 0
+money = 0
 for i, symbol in enumerate(markets):
-    if symbol in marketHistory and len(marketHistory[symbol]) > 200:
+    if symbol in marketHistory and len(marketHistory[symbol]) > MIN_DATA_PTS:
         data = marketHistory[symbol]
-        _EMA_200_ = EMA(data,200)
-        _EMA_50_ = EMA(data,50)
-        _RSI_ = RSI(data, 10)
-        now = len(_RSI_) - 1
-        if _RSI_[now] <= 20:
-            print_trade(symbol, str(round(data[now]*10000)/10000), 'BUY')
-        elif _RSI_[now] >= 80:
-            print_trade(symbol, str(round(data[now]*10000)/10000), 'SELL')
-        """plt.subplot(2,1,1)
-        plt.plot(data, color='black')
-        plt.plot(_EMA_200_, color='red')
-        plt.plot(_EMA_50_, color='green')
-        plt.subplot(2,1,2)
-        plt.plot(_RSI_, color='black')
-        plt.show()"""
+        EMA1 = EMA(data, DEFAULT_EMA_1)
+        EMA2 = EMA(data, DEFAULT_EMA_2)
+        _RSI_ = RSI(data, DEFAULT_RSI_1)
+        #now = len(_RSI_) - 1
+        action = 'None'
+        previousBuy = -1
+        for now in range(len(data)):
+            if _RSI_[now] <= MIN_RSI_BUY and data[now] < EMA1[now] and action != 'BUY':
+                print_trade(symbol, str(round(data[now] * DATA_PRECISION) / DATA_PRECISION), 'BUY')
+                action = 'BUY'
+                previousBuy = data[now]
+                #print_data(data, EMA2, EMA1, _RSI_)
+            elif _RSI_[now] >= MAX_RSI_SELL and data[now] > EMA1[now] and action != 'SELL':
+                print_trade(symbol, str(round(data[now] * DATA_PRECISION) / DATA_PRECISION), 'SELL')
+                if  previousBuy != 1 and previousBuy <= data[now]:
+                    amount += 1
+                    wins += 1
+                    money += abs(data[now] - previousBuy)
+                elif previousBuy != 1:
+                    amount += 1
+                    money -= abs(data[now] - previousBuy)
+                #print_data(data, EMA2, EMA1, _RSI_)
+                action = 'SELL'
+std2.write_line(f'The startegy tested has a win rate of {round(wins / amount * 100 * DATA_PRECISION) / DATA_PRECISION}% for {amount} BUY&SELL trades')
+std2.write_line(f'Money earned : {money} USD')
 
 # Exit
 pause = input('\nPress a key to exit.')
