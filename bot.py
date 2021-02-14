@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 from api.connect import *
 from api.order import *
 from api.tracking import *
-from dft.dft import *
-from dft.denoise import *
-from strategy.analysis import *
+from analysis.dft import *
+from analysis.analysis import *
 import utils.stdout2 as std2
 from constants import *
 from exceptions import *
