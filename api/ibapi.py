@@ -6,7 +6,6 @@ from ibapi.order import *
 import threading
 import time
 
-from api import order
 
 class IBapi(EWrapper, EClient):
 	def __init__(self):
@@ -20,9 +19,9 @@ class IBapi(EWrapper, EClient):
 	def orderStatus(self, orderId, status, filled, remaining, avgFullPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
 		print(f'Order {status} ~ #{orderId}')
 	
-	#def openOrder(self, orderId, contract, order, orderState):
-		#print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
-			#orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
+	def openOrder(self, orderId, contract, order, orderState):
+		print('Order ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Exchange : {} \n\t Action : {} \n\t Order Type : {} \n\t Quantity : {} \n\t Order State : {}'.format(
+			orderId, contract.symbol, contract.secType, contract.exchange, order.action, order.orderType, order.totalQuantity, orderState.status))
 	
 	def execDetails(self, reqId, contract, execution):
 		print('Order Executed ~ #{} \n\t Symbol : {} \n\t SecType : {} \n\t Currency : {} \n\t Execution ID : {} \n\t Order ID : {}\n\t Shares : {} \n\t Last Liquidity : {}'.format(
@@ -48,10 +47,12 @@ def initAPI():
 	app = IBapi()
 	app.connect('127.0.0.1', 7497, 123)
 	app.nextorderId = None
+
 	# Create thread
 	thread_exec = lambda: app.run()
 	api_thread = threading.Thread(target=thread_exec, daemon=True)
 	api_thread.start()
+	
 	# Wait for connection
 	while not isinstance(app.nextorderId, int):
 		print('Waiting For Connection...')
