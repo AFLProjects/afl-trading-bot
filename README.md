@@ -6,15 +6,18 @@ It uses a combination of strategies and indicators to automatically find the bes
 > Use the software at your own risk. The authors and all affiliates assume no responsibility for your trading results
 
 ## Setup
-- Create an account at [Interactive Brokers](https://www.interactivebrokers.com/en/home.php)
-- Download the [TWS]()(Trader Work Station)
-- Setup the TWS([Tutorial](https://interactivebrokers.github.io/tws-api/initial_setup.html))
+- Create an account at [Interactive Brokers](https://www.interactivebrokers.com/en/home.php)(Live or paper)
+- Download and install the [TWS](https://www.interactivebrokers.com/en/index.php?f=16040)(Trader Workstation)
+> Please note that you MUST download the OFFLINE version of TWS, not the self- updating version
+- Start and setup the TWS([Tutorial](https://interactivebrokers.github.io/tws-api/initial_setup.html))
 - Download the repo 
 ```sh
 $ git clone https://github.com/AFLProjects/afl-trading-bot.git
 ```
+- In the **/autorun** folder insert your credentials and the trading method(paper or live)
 - Start **setup.py**
-- Start **bot.py**
+- To start the bot manually, start **bot.py**
+- To start the bot automatically put a shortcut towards **bot.py** in your system startup folder
 
 ## Simulation Results
 
