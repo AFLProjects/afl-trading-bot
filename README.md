@@ -1,7 +1,8 @@
 ## AFL Stock Trading Bot
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
-[![Generic badge](https://img.shields.io/badge/License-MIT-g)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/Python-3.8-blue)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/Release-Not yet-red)](https://shields.io/) 
+
+[![Generic badge](https://img.shields.io/badge/License-MIT-g)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/Python-3.8-blue)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/Release-Not_yet-red)](https://shields.io/) 
 
 The project is an advanced python stock trading bot using the [IB API](https://github.com/InteractiveBrokers/tws-api-public). It offers the possibility to trade internationally for free using the Interactive Brokers API.
 
