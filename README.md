@@ -18,6 +18,7 @@ $ git clone https://github.com/AFLProjects/afl-trading-bot.git
 - Start **setup.py**
 - To start the bot manually, start **bot.py**
 - To start the bot automatically put a shortcut towards **bot.py** in your system startup folder
+> Everytime your computer will start, the bot will automatically start TWS, insert your credentials and start trading in the desired mode.
 
 ## Simulation Results
 
