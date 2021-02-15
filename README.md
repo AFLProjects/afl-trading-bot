@@ -1,4 +1,4 @@
-## AFL Stock Trading Bot
+# AFL Stock Trading Bot
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
