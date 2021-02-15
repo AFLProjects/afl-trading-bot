@@ -7,6 +7,7 @@ It uses a combination of strategies and indicators to automatically find the bes
 
 ## Setup
 - Create an account at [Interactive Brokers](https://www.interactivebrokers.com/en/home.php)(Live or paper)
+> Note that have always the possibility to use a paper account and trade with fake money
 - Download and install the [TWS](https://www.interactivebrokers.com/en/index.php?f=16040)(Trader Workstation)
 > Please note that you MUST download the OFFLINE version of TWS, not the self- updating version
 - Start and setup the TWS([Tutorial](https://interactivebrokers.github.io/tws-api/initial_setup.html))
@@ -15,8 +16,9 @@ It uses a combination of strategies and indicators to automatically find the bes
 $ git clone https://github.com/AFLProjects/afl-trading-bot.git
 ```
 - In the **/autorun** folder insert your credentials and the trading method(paper or live)
+> This folder contains the IBController 3.4 release, in order to automatically start the TWS, see their documentation for more information
 - Start **setup.py**
-- To start the bot manually, start **bot.py**
+> setup.py will install the necessary python libraries
 - To start the bot automatically put a shortcut towards **bot.py** in your system startup folder
 > Everytime your computer will start, the bot will automatically start TWS, insert your credentials and start trading in the desired mode.
 
