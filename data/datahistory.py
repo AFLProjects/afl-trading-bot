@@ -95,21 +95,34 @@ class DataHistory:
                 self.lowData.append(rawData['Low'][i])
                 self.dateIndex.append(k)
 
+# Static pack cache
 def _pack_cache_(symbol):
     path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
     with open(path, 'wb') as output:
         pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
+# Static unpack cache
 def _unpack_cache_(symbol):
     path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
     with open(path, 'rb') as input:
         return pickle.load(input)
 
-class Symbol:
+# Static cache checking
+def _cache_created_(symbol):
+        path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
+        try:
+            f = open(path)
+            f.close()
+            return True
+        except:
+            return False
+
+class SymbolData:
+    # Init symbol data
     def __init__(self, symbol):
         self.symbol = symbol
         if not self.cache_created():
-            endDate = (date.today() - timedelta(days=200)).strftime("%Y-%m-%d")
+            endDate = date.today().strftime("%Y-%m-%d")
             startDate = (date.today() - timedelta(days=365)).strftime("%Y-%m-%d")
             datahistory = yfinance.download(self.symbol, startDate, endDate, interval = '1d', threads = False)
             self.datahistory = DataHistory(datahistory)
@@ -131,16 +144,19 @@ class Symbol:
             self.price = self.datahistory.getprice()
             self.pack_cache()
 
+    # Pack symbol data into cache folder
     def pack_cache(self):
             path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
             with open(path, 'wb') as output:
                     pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
+    # Unpack symbol data into cache folder
     def unpack_cache(self):
             path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
             with open(path, 'rb') as input:
                     return pickle.load(input)
 
+    # Check if cache is created
     def cache_created(self):
         path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
         try:
