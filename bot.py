@@ -18,14 +18,7 @@ import time, csv, os, sys
 import urllib.request
 import signal, multiprocessing
 
-# Setup user-agent
-try:
-    opener = urllib.request.build_opener()
-    opener.addheaders = [('User-Agent', DEFAULT_USER_AGENT)]
-    urllib.request.install_opener(opener)
-except:
-    std2.write_line(MSG_OPENER_FAILED)
-    raise UserAgentSetupError
+setup_downloader()
 
 # Market data
 fecthMarkets = True
