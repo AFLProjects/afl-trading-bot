@@ -39,7 +39,7 @@ def exit_after(s):
         return inner
     return outer
 
-#@exit_after(5)
+@exit_after(5)
 def getStockPriceHistory(stock, interval, dateStart, dateEnd):
 	data = yf.download(stock, dateStart, dateEnd, interval = interval, threads = False)['Close']
 	graph = []
