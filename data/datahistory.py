@@ -58,7 +58,8 @@ class DataHistory:
 		if i >= 0 and i < len(self.dateIndex):
 			return self.dateIndex[i]
 		else:
-			
+			raise DataError
+			return None
 
 	# Convert from date to index
 	def convert_from_date_to_index(i):
