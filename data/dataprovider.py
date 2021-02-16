@@ -21,11 +21,13 @@ try:
 except NameError:
     pass
 
+# Force quit function
 def quit_function(fn_name):
     sys.stderr.flush()
     thread.interrupt_main()
     raise Exception("Time out")
 
+# Decorator exit after s seconds
 def exit_after(s):
     def outer(fn):
         def inner(*args, **kwargs):
@@ -39,16 +41,16 @@ def exit_after(s):
         return inner
     return outer
 
+"""
+Get full data history of a stock
+"""
 @exit_after(5)
-def getStockPriceHistory(stock, interval, dateStart, dateEnd):
-	data = yf.download(stock, dateStart, dateEnd, interval = interval, threads = False)['Close']
-	graph = []
-	for i, value in enumerate(data):
-		if not math.isnan(value):
-			graph.append(value)
-	return graph
+def gethistory(stock, dateStart, dateEnd, interval):
+    return yf.download(stock, dateStart, dateEnd, interval = interval, threads = False)
 
-def getCurrentPrice(symbol):
-    ticker = yf.Ticker(symbol)
-    todays_data = ticker.history(period='1d')
-    return todays_data['Close'][0]
+"""
+Get current close price of a stock
+"""
+@exit_after(5)
+def getprice(symbol):
+    return yf.Ticker(symbol).history(period='1d')['Close'][0]

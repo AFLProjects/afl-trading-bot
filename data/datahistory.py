@@ -3,11 +3,12 @@ import yfinance as yfinance
 import time, math
 import pickle
 import os
+import dataprovider as dp
 
 class DataHistory:
     def __init__(self, data):
         # Init Data
-        self.rawData = data
+        rawData = data
         self.closeData = []
         self.openData = []
         self.highData = []
@@ -15,12 +16,12 @@ class DataHistory:
         self.dateIndex = []
 
         # Store Data
-        keys = list(self.rawData['Close'].keys())
-        for i in range(len(self.rawData['Close'])):
-            self.closeData.append(self.rawData['Close'][i])
-            self.openData.append(self.rawData['Open'][i])
-            self.highData.append(self.rawData['High'][i])
-            self.lowData.append(self.rawData['Low'][i])
+        keys = list(rawData['Close'].keys())
+        for i in range(len(rawData['Close'])):
+            self.closeData.append(rawData['Close'][i])
+            self.openData.append(rawData['Open'][i])
+            self.highData.append(rawData['High'][i])
+            self.lowData.append(rawData['Low'][i])
             self.dateIndex.append(keys[i].strftime("%Y-%m-%d"))
 
     # Get price using formatted date "%Y-%m-%d"
@@ -124,7 +125,7 @@ class SymbolData:
         if not self.cache_created():
             endDate = date.today().strftime("%Y-%m-%d")
             startDate = (date.today() - timedelta(days=365)).strftime("%Y-%m-%d")
-            datahistory = yfinance.download(self.symbol, startDate, endDate, interval = '1d', threads = False)
+            datahistory =  dp.gethistory(self.symbol, startDate, endDate, '1d')
             self.datahistory = DataHistory(datahistory)
             self.price = self.datahistory.getprice()
             self.used = False
@@ -137,9 +138,10 @@ class SymbolData:
             self.used = cached.used
             self.status = cached.status
             endDate = date.today().strftime("%Y-%m-%d")
-            startDate = self.datahistory.get_end_date()
+            startDate = datetime.strptime(self.datahistory.get_end_date(), "%Y-%m-%d")
+            startDate = (startDate - timedelta(days=7)).strftime("%Y-%m-%d")
             if endDate > startDate:
-                datahistory = yfinance.download(self.symbol, startDate, endDate, interval = '1d', threads = False)
+                datahistory = dp.gethistory(self.symbol, startDate, endDate, '1d')
                 self.datahistory.append(datahistory)
             self.price = self.datahistory.getprice()
             self.pack_cache()
@@ -165,3 +167,5 @@ class SymbolData:
             return True
         except:
             return False
+
+AAPL = SymbolData('AAPL')
