@@ -1,9 +1,7 @@
 from datetime import *
+from exceptions import *
 
-class DataFrame:
-	def IsDataValid(data):
-		return True if not (math.nan(data) or data == 0) else False
-
+class DataHistory:
 	def __init__(self, data):
 		# Init Data
 		self.rawData = data
@@ -12,11 +10,10 @@ class DataFrame:
 		self.highData = []
 		self.lowData = []
 		self.dateIndex = []
-
 		# Store Data
-		keys = list(self.rawData.keys())
-		for i in range(len(self.rawData)):
-			if IsDataValid(self.rawData['Close'][i]):
+		keys = list(self.rawData['Close'].keys())
+		for i in range(len(self.rawData['Close'])):
+			if not math.nan(self.rawData['Close'][i]):
 				closeData.append(self.rawData['Close'][i])
 				openData.append(self.rawData['Open'][i])
 				highData.append(self.rawData['High'][i])
@@ -25,7 +22,11 @@ class DataFrame:
 
 	# Get price using formatted date "%Y-%m-%d"
 	def getprice_fdate(date):
-		return self.closeData[self.dateIndex.indexof(date)]
+		if date in dateIndex:
+			return self.closeData[self.dateIndex.indexof(date)]
+		else:
+			raise DataError
+			return None
 
 	# Get price using year, month & day
 	def getprice_date(day, month, year):
@@ -34,7 +35,11 @@ class DataFrame:
 
 	# Get price using index
 	def getprice_index(index):
-		return self.closeData[i]
+		if i >= 0 and i < len(self.closeData):
+			return self.closeData[i]
+		else:
+			raise DataError
+			return None
 
 	# Get current price
 	def getprice():
@@ -50,11 +55,18 @@ class DataFrame:
 
 	# Convert from index to date
 	def convert_from_index_to_date(i):
-		return self.dateIndex[i]
+		if i >= 0 and i < len(self.dateIndex):
+			return self.dateIndex[i]
+		else:
+			
 
 	# Convert from date to index
 	def convert_from_date_to_index(i):
-		return self.dateIndex.indexof(date)
+		if date in dateIndex:
+			return self.dateIndex.indexof(date)
+		else:
+			raise DataError
+			return None
 
 class Symbol:
 	def __init__(self, symbol, dataframe):
