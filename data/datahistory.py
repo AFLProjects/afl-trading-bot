@@ -10,6 +10,7 @@ class DataHistory:
 		self.highData = []
 		self.lowData = []
 		self.dateIndex = []
+		
 		# Store Data
 		keys = list(self.rawData['Close'].keys())
 		for i in range(len(self.rawData['Close'])):
