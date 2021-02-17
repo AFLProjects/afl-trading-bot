@@ -113,6 +113,10 @@ def getsymbols_finviz():
             break
     return markets
 
+"""
+Find uptrending markets from yahoo
+using urllib request and web scrapping
+"""
 def getsymbols_yahoo():
     # Market Data
     markets = []
@@ -139,6 +143,32 @@ def getsymbols_yahoo():
         raise DownloadException
     return markets
 
-setup_downloader()
-getsymbols_finviz()
-getsymbols_yahoo()
+"""
+Download symbols from yahoo and finviz
+"""
+def download_symbols():
+    # Symbol data
+    s1 = getsymbols_finviz()
+    s2 = getsymbols_yahoo()
+    symbols = []
+
+    # Filter data
+    for i, symbol in enumerate(s1):
+        if not symbol in symbols:
+            symbols.append(symbol)
+    for i, symbol in enumerate(s2):
+        if not symbol in symbols:
+            symbols.append(symbol)
+    return symbols
+
+"""
+Get symbols from csv
+"""
+def getsymbols_csv(path):
+    markets = []
+    with open(path) as f:
+        for row in f:
+            sbl = row.split(',', 1)[0]
+            if sbl != 'Symbol':
+                markets.append(sbl)
+    return markets

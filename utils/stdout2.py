@@ -34,21 +34,21 @@ def write_line_autocomplete(str, length):
     sys.stdout.flush()
 
 # Draw a progress bar
-def write_progress_bar(i, m, toolbar_width):
+def write_progress_bar(i, m, toolbar_width, start='', end=''):
     p = f'{round(i / m * 100)}.'
     p += '0' * (5 - len(p))
-    sys.stdout.write(f'{p}% |')
+    sys.stdout.write(f'{start}{p}% |')
     c = ceil(round(toolbar_width * (i / m)))
     for j in range(c):
         sys.stdout.write("█")
     sys.stdout.write(' ' * (toolbar_width - c))
-    sys.stdout.write(f'| {i}/{m} \r')
+    sys.stdout.write(f'| {i}/{m}{end}\r')
     if i == m:
     	sys.stdout.write('\n')
     sys.stdout.flush()
 
 # Draw a progress bar while waiting
-def pause_progress_bar(seconds):
+def pause_progress_bar(seconds, start='', end=''):
     for i in range(seconds * 100):
         time.sleep(seconds / 100)
-        write_progress_bar(i+1, seconds * 100, 40)
+        write_progress_bar(i+1, seconds * 100, 40, start=start, end=end)

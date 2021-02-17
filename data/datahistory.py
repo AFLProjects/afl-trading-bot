@@ -3,7 +3,7 @@ import yfinance as yfinance
 import time, math
 import pickle
 import os
-import dataprovider as dp
+import data.dataprovider as dp
 
 class DataHistory:
     def __init__(self, data):
@@ -98,19 +98,24 @@ class DataHistory:
 
 # Static pack cache
 def _pack_cache_(symbol):
-    path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
+    path =  f'{os.path.normpath(os.getcwd())}\\cache\\{symbol}.sbl'
     with open(path, 'wb') as output:
         pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+    file = open(f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.log', 'w+')
+    file.seek(0)
+    file.write(date.today().strftime("%Y-%m-%d"))
+    file.truncate()
+    file.close()
 
 # Static unpack cache
 def _unpack_cache_(symbol):
-    path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
+    path =  f'{os.path.normpath(os.getcwd())}\\cache\\{symbol}.sbl'
     with open(path, 'rb') as input:
         return pickle.load(input)
 
 # Static cache checking
 def _cache_created_(symbol):
-        path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{symbol}.sbl'
+        path =  f'{os.path.normpath(os.getcwd())}\\cache\\{symbol}.sbl'
         try:
             f = open(path)
             f.close()
@@ -127,10 +132,11 @@ class SymbolData:
             startDate = (date.today() - timedelta(days=365)).strftime("%Y-%m-%d")
             datahistory =  dp.gethistory(self.symbol, startDate, endDate, '1d')
             self.datahistory = DataHistory(datahistory)
-            self.price = self.datahistory.getprice()
-            self.used = False
-            self.status = 'None'
-            self.pack_cache()
+            if len(self.datahistory.closeData) > 0:
+                self.price = self.datahistory.getprice()
+                self.used = False
+                self.status = 'None'
+                self.pack_cache()
         else:
             cached = self.unpack_cache()
             self.datahistory = cached.datahistory
@@ -140,32 +146,42 @@ class SymbolData:
             endDate = date.today().strftime("%Y-%m-%d")
             startDate = datetime.strptime(self.datahistory.get_end_date(), "%Y-%m-%d")
             startDate = (startDate - timedelta(days=7)).strftime("%Y-%m-%d")
-            if endDate > startDate:
+            path =  f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.log'
+            lastUpdated = ''
+            with open(path) as f:
+                    lastUpdated = f.readline()
+            if endDate > startDate and endDate != lastUpdated:
                 datahistory = dp.gethistory(self.symbol, startDate, endDate, '1d')
                 self.datahistory.append(datahistory)
-            self.price = self.datahistory.getprice()
+            if len(self.datahistory.closeData) > 0:
+                self.price = self.datahistory.getprice()
+            else:
+                self.price = -1
             self.pack_cache()
 
     # Pack symbol data into cache folder
     def pack_cache(self):
-            path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
+            path =  f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.sbl'
             with open(path, 'wb') as output:
                     pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            file = open(f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.log', 'w+')
+            file.seek(0)
+            file.write(date.today().strftime("%Y-%m-%d"))
+            file.truncate()
+            file.close()
 
     # Unpack symbol data into cache folder
     def unpack_cache(self):
-            path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
+            path =  f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.sbl'
             with open(path, 'rb') as input:
                     return pickle.load(input)
 
     # Check if cache is created
     def cache_created(self):
-        path =  f'{os.path.normpath(os.getcwd() + os.sep + os.pardir)}\\cache\\{self.symbol}.sbl'
+        path =  f'{os.path.normpath(os.getcwd())}\\cache\\{self.symbol}.sbl'
         try:
             f = open(path)
             f.close()
             return True
         except:
             return False
-
-AAPL = SymbolData('AAPL')

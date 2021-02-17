@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from api.ibapi import *
 from api.apihelper import *
 from data.dataprovider import *
-from data.dataframe import *
+from data.datahistory import *
 from analysis.dft import *
 from analysis.analysis import *
 import utils.stdout2 as std2
@@ -18,98 +18,23 @@ import time, csv, os, sys
 import urllib.request
 import signal, multiprocessing
 
+# Setup User Agent
 setup_downloader()
 
-# Market data
-fecthMarkets = True
-markets = []
-index = 1
+# Download Symbol Names
+#markets =  download_symbols()
+markets = getsymbols_csv('symbols.csv')
+std2.write('Downloading symbol data...\n')
 
-# Fecth trending markets from Finviz
-std2.write_line('Finding trending markets from finviz...')
-size = 0
-while fecthMarkets:
-    try:
-        url = f'{URL_FINVIZ}{index}'
-        with urllib.request.urlopen(url) as f:
-            html = f.read().decode('utf-8')
-            std2.pause_progress_bar(1)
-            std2.write_line(f'[{sys.getsizeof(html)} bytes] {url}')
-            parse = (html.split('<!-- TS')[1]).split('TE -->')[0]
-            for i, value in enumerate(parse.splitlines()):
-                ticker = value.split('|')[0]
-                if ticker in markets:
-                    fecthMarkets = False
-                    break
-                elif ticker:
-                    markets.append(ticker)
-            size += sys.getsizeof(html)
-            index += 12
-    except:
-        print(MSG_FETCHING_FAILED)
-        raise DownloadException
-        break
-std2.write_line('\nFinding trending markets from yahoo...')
-url = URL_YAHOO
-try:
-    with urllib.request.urlopen(url) as f:
-        htmlParse = f.read().decode('utf-8')
-        std2.pause_progress_bar(1)
-        while 'data-symbol=\"' in htmlParse:
-            htmlParse = htmlParse.split('data-symbol=\"', 1)[1]
-            market = htmlParse.split('\"', 1)[0]
-            if not market in markets:
-                markets.append(market)
-    std2.write_line(f'\n[{size} bytes] Found {len(markets)} markets with an uptrend.\n')
-except:
-    std2.write_line(MSG_FETCHING_FAILED)
-    raise DownloadException
-    
-# History data
-marketHistory = {}
-dataPoints = 0
-size = 0
-
-# Fetch Market History
-std2.write_line('Fectching market history...')
-errorMsgBuffer = ''
+# Download symbol data
+Symbols = [None] * len(markets)
 for i, symbol in enumerate(markets):
-    std2.write_progress_bar(i+1, len(markets), PROGRESS_BAR_SIZE)
-    endDate = date.today().strftime(DATE_FORMAT)
-    startDate = (date.today() - timedelta(days=TIME_FRAME_DAYS)).strftime(DATE_FORMAT)
+    std2.write_progress_bar(i+1, len(markets), PROGRESS_BAR_SIZE, end=(' ' + symbol))
     with std2.suppress_stdout():
         try:
-            marketHistory[symbol] = getStockPriceHistory(symbol, '1d', startDate, endDate)
-            dataPoints += len(marketHistory[symbol])
-            size += sys.getsizeof(marketHistory[symbol])
+            Symbols[i] = SymbolData(symbol)
         except:
-            errorMsgBuffer += f'[Exception] Couldn\'t download data for {symbol} !\n'
-std2.write_line(f'{errorMsgBuffer}[{size} bytes] Downloaded {dataPoints} data points from {len(markets)} uptrending markets\n')
-
-# Find previously used markets
-std2.write_line('Finding previously used markets...')
-try:
-    with open('logs.txt') as f:
-        content = f.readlines()
-        logCount = int(content[0])
-        if logCount > 0:
-            for i in range(1, logCount + 1):
-                std2.write_progress_bar(i, logCount, PROGRESS_BAR_SIZE)
-                market = content[i].split('|')[0]
-                if not market in markets:
-                    markets.append(market)
-            std2.write_line(f'\nFound {logCount} previously used markets')
-        else:
-            std2.write_line('\nFound 0 previously used markets')
-except IOError:
-    try:
-        f = open(FILE_LOGS, FILE_CREATE)
-        f.write("0")
-        f.close()
-    except:
-        raise FileError
-
-std2.write_line(f'Found a total of {len(markets)} markets to analyse within the next hour !')
+            Symbols[i] = None
 
 # Searching for trades
 def print_trade(symbol, price, action):
