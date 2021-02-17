@@ -1,9 +1,7 @@
 from math import *
 
 """
-Calculate moving average
-graph -> data
-window_size -> moving average period
+Calculates moving average
 """
 def MA(graph, window_size):
 	# Calculate MA Length
@@ -13,9 +11,7 @@ def MA(graph, window_size):
 	return [sum(graph[i : i + window_size]) / window_size for i in range(L)]
 
 """
-Calculate exponential moving average
-graph -> data
-window_size -> moving average period
+Calculates exponential moving average
 """
 def EMA(graph, window_size):
 	# Init EMA
