@@ -15,7 +15,6 @@ def EMA(graph, window_size):
 		prevEMA = EMA[i]
 	return EMA
 
-
 # Calculates the average gain
 def average_gain(data, offset, window_size):
 	avg = 0
@@ -26,7 +25,6 @@ def average_gain(data, offset, window_size):
 			avg += nxt - curr
 	avg /= window_size
 	return avg
-
 
 # Calculates the average loss
 def average_loss(data, offset, window_size):
@@ -39,7 +37,6 @@ def average_loss(data, offset, window_size):
 	avg /= window_size
 	return avg
 
-
 # Calculates the gain
 def gain(data, offset, window_size):
 	gain = 0
@@ -49,7 +46,6 @@ def gain(data, offset, window_size):
 		if nxt - curr > 0:
 			gain += nxt - curr
 	return gain
-
 
 # Calculates the loss
 def loss(data, offset, window_size):
