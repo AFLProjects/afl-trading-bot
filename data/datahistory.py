@@ -18,11 +18,12 @@ class DataHistory:
         # Store Data
         keys = list(rawData['Close'].keys())
         for i in range(len(rawData['Close'])):
-            self.closeData.append(rawData['Close'][i])
-            self.openData.append(rawData['Open'][i])
-            self.highData.append(rawData['High'][i])
-            self.lowData.append(rawData['Low'][i])
-            self.dateIndex.append(keys[i].strftime("%Y-%m-%d"))
+            if not math.isnan(rawData['Close'][i]) and rawData['Close'][i] != None and rawData['Close'][i] != 0:
+                self.closeData.append(rawData['Close'][i])
+                self.openData.append(rawData['Open'][i])
+                self.highData.append(rawData['High'][i])
+                self.lowData.append(rawData['Low'][i])
+                self.dateIndex.append(keys[i].strftime("%Y-%m-%d"))
 
     # Get price using formatted date "%Y-%m-%d"
     def getprice_fdate(self, date):
@@ -134,8 +135,11 @@ class SymbolData:
             self.datahistory = DataHistory(datahistory)
             if len(self.datahistory.closeData) > 0:
                 self.price = self.datahistory.getprice()
+                self.previous_price = -1
+                self.quantity = 0
                 self.used = False
                 self.status = 'None'
+                self.stoploss = 0
                 self.pack_cache()
         else:
             cached = self.unpack_cache()
@@ -143,6 +147,9 @@ class SymbolData:
             self.price = cached.price
             self.used = cached.used
             self.status = cached.status
+            self.quantity = cached.quantity
+            self.previous_price = cached.previous_price
+            self.stoploss = cached.stoploss
             endDate = date.today().strftime("%Y-%m-%d")
             startDate = datetime.strptime(self.datahistory.get_end_date(), "%Y-%m-%d")
             startDate = (startDate - timedelta(days=7)).strftime("%Y-%m-%d")

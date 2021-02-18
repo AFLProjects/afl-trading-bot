@@ -15,6 +15,18 @@ def EMA(graph, window_size):
 		prevEMA = EMA[i]
 	return EMA
 
+def TR(dataframe, i):
+	r = max(dataframe.highData[i], dataframe.closeData[i-1])
+	r -= min(dataframe.lowData[i], dataframe.closeData[i-1])
+	return r
+
+def ATR(dataframe, n):
+	ATR = [0] * len(dataframe.closeData)
+	ATR[0] = sum(TR(dataframe, i) for i in range(1, n)) / n
+	for j in range(1, len(dataframe.closeData)):
+		ATR[j] = (ATR[j-1] * (n-1) + TR(dataframe, j)) / n
+	return ATR
+
 # Calculates the average gain
 def average_gain(data, offset, window_size):
 	avg = 0
