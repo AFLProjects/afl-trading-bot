@@ -5,6 +5,8 @@ from analysis.analysis import *
 import utils.stdout2 as std2
 from constants import *
 from exceptions import *
+from api.tws_api import *
+from api.tws_start import *
 
 class Environement:
     def is_symbol_valid(self, Symbol):
@@ -17,9 +19,8 @@ class Environement:
         price = self.data[i].datahistory.closeData[d]
         return ema != None and rsi != None and atr != None and price != None
 
-    def __init__(self, mode, data):
+    def __init__(self, data):
         # Init values
-        self.mode = mode
         self.data = data
         self.cash = 0
         self.monthlyDeposit = 0
@@ -142,4 +143,58 @@ class Environement:
                         self.simulate_sell(i, d)
         std2.write_line(f'The startegy tested has a win rate of {round(self.wins / self.tradeCount * 100 * DATA_PRECISION) / DATA_PRECISION}% for {self.tradeCount} BUY&SELL trades')
         std2.write_line(f'The startegy tested has an average gain of {round(self.average_gain / self.tradeCount * 100 * DATA_PRECISION) / DATA_PRECISION}% for {self.tradeCount} BUY&SELL trades')
+
+    def buy(self, symbol_index, api, enable_api):
+        date = len(self.data[symbol_index].datahistory.closeData) - 1
+        symbol = self.data[symbol_index]
+        close_price = self.data[symbol_index].datahistory.closeData
+        symbol.quantity = floor((.03 * self.cash) / close_price[date])
+        if enable_api and api is not None:
+            contract = tws_api.IBStockContract(self.data[symbol_index].symbol)
+            order = tws_api.IBLimitOrder('BUY', symbol.quantity, close_price[date])
+            api.placeOrder(api.nextorderId, contract, order)
+        symbol.status = 'BUY'
+        symbol.previous_price = close_price[date]
+        symbol.stoploss = close_price[date] - self.atr_dataset[symbol_index][date]
+        self.cash -= symbol.quantity * close_price[date]
+        self.evaluate_netliquidation(date)
+        self.environement_print_trade(symbol.symbol, self.env_format(close_price[date]),'BUY',
+            symbol.datahistory.convert_from_index_to_date(date), self.env_format(self.cash),
+            symbol.quantity, self.env_format(self.netliquidation), self.env_format(symbol.stoploss), 'BUY')
+        #symbol.pack_cache()
+
+    def sell(self, symbol_index, api, enable_api):
+        symbol = self.data[symbol_index]
+        close_price = self.data[symbol_index].datahistory.closeData
+        date = len(self.data[symbol_index].datahistory.closeData) - 1
+        if enable_api and api is not None:
+            contract = tws_api.IBStockContract(self.data[symbol_index].symbol)
+            order = tws_api.IBLimitOrder('SELL', symbol.quantity, close_price[date])
+            api.placeOrder(api.nextorderId, contract, order)
+        if symbol.previous_price <= close_price[date]:
+            self.tradeCount += 1
+            self.wins += 1
+        else:
+            self.tradeCount += 1
+        self.average_gain += (close_price[date] - symbol.previous_price) / symbol.previous_price
+        symbol.status = 'SELL'
+        self.cash += symbol.quantity * close_price[date]
+        self.evaluate_netliquidation(date)
+        self.environement_print_trade(symbol.symbol, self.env_format(close_price[date]),'SELL',
+            symbol.datahistory.convert_from_index_to_date(date), self.env_format(self.cash),
+            symbol.quantity, self.env_format(self.netliquidation), self.env_format(symbol.stoploss), 'SELL')
+        symbol.quantity = 0
+        symbol.stoploss = 0
+        #symbol.pack_cache()
+
+    def start(self, twsapi):
+        for i, symbol in enumerate(self.data):
+            if self.is_symbol_valid(symbol):
+                d = len(symbol.datahistory.closeData) - 1
+                if d > 0 and self.is_data_valid(i, d):
+                    if self.buying_opportunity(i, d):
+                        self.buy(i, twsapi, False)
+                    elif self.selling_opportunity(i, d) or self.stoploss_opportunity(i, d):
+                        self.sell(i, twsapi, False)
+
 

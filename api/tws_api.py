@@ -42,7 +42,7 @@ class IBapi(EWrapper, EClient):
 			raise Exception('error getting contract details')
 		return app.contract_details[reqId].contract
 
-def initAPI():
+def init_api():
 	# Connect to workstation 127.0.0.1:7497
 	app = IBapi()
 	app.connect('127.0.0.1', 7497, 123)

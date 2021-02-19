@@ -10,6 +10,8 @@ import utils.stdout2 as std2
 from constants import *
 from exceptions import *
 from environement import *
+from api.tws_api import *
+from api.tws_start import _init_api_
 
 # System libraries
 from datetime import date, timedelta
@@ -18,6 +20,7 @@ import urllib.request
 import signal, multiprocessing
 
 #setup_downloader()
+
 std2.write('Extracting csv data...\n')
 markets = getsymbols_csv('symbols.csv')
 std2.write('Downloading symbol data...\n')
@@ -29,10 +32,11 @@ for i, symbol in enumerate(markets):
             Symbols[i] = SymbolData(symbol)
         except:
             Symbols[i] = None
-e = Environement('simulation', Symbols)
-e.simulate_deposit(1000000000)
-e.simulate_monthlydeposit(0)
+e = Environement(Symbols)
+e.simulate_deposit(10000)
+api = _init_api_()
 e.environement_output_init()
-e.simulate()
+e.start(api)
 pause = input('\nPress a key to exit.')
+
 
