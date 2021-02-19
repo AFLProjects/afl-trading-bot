@@ -29,10 +29,9 @@ for i, symbol in enumerate(markets):
             Symbols[i] = SymbolData(symbol)
         except:
             Symbols[i] = None
-symbols = [SymbolData(symbol) for i,symbol in enumerate(markets)]
 e = Environement('simulation', Symbols)
-e.simulate_deposit(400)
-e.simulate_monthlydeposit(20)
+e.simulate_deposit(1000000000)
+e.simulate_monthlydeposit(0)
 e.environement_output_init()
 e.simulate()
 pause = input('\nPress a key to exit.')

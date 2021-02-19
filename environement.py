@@ -26,6 +26,7 @@ class Environement:
         self.netliquidation = 0
         self.tradeCount = 0
         self.wins = 0
+        self.average_gain = 0
 
         # Calculate EMA, RSI and ATR for all the symbols
         self.ema_dataset = [None] * len(self.data)
@@ -113,6 +114,7 @@ class Environement:
             self.wins += 1
         else:
             self.tradeCount += 1
+        self.average_gain += (close_price[date] - symbol.previous_price) / symbol.previous_price
         symbol.status = 'SELL'
         self.cash += symbol.quantity * close_price[date]
         self.evaluate_netliquidation(date)
@@ -139,4 +141,5 @@ class Environement:
                     elif self.selling_opportunity(i, d) or self.stoploss_opportunity(i, d):
                         self.simulate_sell(i, d)
         std2.write_line(f'The startegy tested has a win rate of {round(self.wins / self.tradeCount * 100 * DATA_PRECISION) / DATA_PRECISION}% for {self.tradeCount} BUY&SELL trades')
+        std2.write_line(f'The startegy tested has an average gain of {round(self.average_gain / self.tradeCount * 100 * DATA_PRECISION) / DATA_PRECISION}% for {self.tradeCount} BUY&SELL trades')
 
