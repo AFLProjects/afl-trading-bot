@@ -11,26 +11,15 @@ def import_package(package):
 modules = [
 	"ibapi",
 	"matplotlib",
-	"contextlib", 
-	"yfinance", 
-	"datetime", 
-	"time", 
-	"signal", 
-	"csv", 
-	"os", 
-	"sys", 
-	"urllib", 
-	"math", 
-	"requests",
-	"multiprocessing"
+	"yfinance",
+        "pyautogui"
 ]
 
 # Check for modules
 std2.write_line('Checking for modules...')
 for i, module in enumerate(modules):
 	std2.write_progress_bar(i+1, len(modules), 40)
-	with std2.suppress_stdout():
-		import_package(module)
+	import_package(module)
 std2.write_line('Everything is up to date !')
 
 # Exit

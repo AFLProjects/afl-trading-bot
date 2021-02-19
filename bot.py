@@ -2,8 +2,6 @@
 import matplotlib.pyplot as plt
 
 # Project Files
-from api.ibapi import *
-from api.apihelper import *
 from data.dataprovider import *
 from data.datahistory import *
 from analysis.dft import *
@@ -31,8 +29,10 @@ for i, symbol in enumerate(markets):
             Symbols[i] = SymbolData(symbol)
         except:
             Symbols[i] = None
+symbols = [SymbolData(symbol) for i,symbol in enumerate(markets)]
 e = Environement('simulation', Symbols)
-e.simulate_deposit(100)
+e.simulate_deposit(400)
+e.simulate_monthlydeposit(20)
 e.environement_output_init()
 e.simulate()
 pause = input('\nPress a key to exit.')

@@ -1,5 +1,3 @@
-from api.ibapi import *
-from api.apihelper import *
 from data.dataprovider import *
 from data.datahistory import *
 from analysis.dft import *
@@ -24,6 +22,7 @@ class Environement:
         self.mode = mode
         self.data = data
         self.cash = 0
+        self.monthlyDeposit = 0
         self.netliquidation = 0
         self.tradeCount = 0
         self.wins = 0
@@ -56,7 +55,6 @@ class Environement:
 
     def env_format(self, value):
         return str(round(value * DATA_PRECISION) / DATA_PRECISION)
-
 
     def evaluate_netliquidation(self, date):
         self.netliquidation = 0
@@ -127,8 +125,13 @@ class Environement:
     def simulate_deposit(self, cash):
         self.cash += cash
 
+    def simulate_monthlydeposit(self, cash):
+        self.monthlyDeposit = cash
+
     def simulate(self):
         for d in range(250):
+            if d % 20 == 0:
+                self.cash += self.monthlyDeposit
             for i, symbol in enumerate(self.data):
                 if self.is_symbol_valid(symbol) and self.is_data_valid(i, d):
                     if self.buying_opportunity(i, d):
